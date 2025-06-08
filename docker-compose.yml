@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  mobifix-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mobifix-backend
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+    - ./backend:/var/www/html
+    networks:
+      - mobifix-net
+
+  mobifix-db:
+    image: mariadb:10.7
+    container_name: mobifix-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: mobifix
+      MYSQL_USER: mobifixuser
+      MYSQL_PASSWORD: mobifixpass
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - mobifix-net
+
+  mobifix-nginx:
+    image: nginx:alpine
+    container_name: mobifix-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./backend:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - mobifix-backend
+    networks:
+      - mobifix-net
+
+volumes:
+  db-data:
+
+networks:
+  mobifix-net:
+    driver: bridge
