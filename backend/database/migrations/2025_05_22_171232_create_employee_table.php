@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('employee', function (Blueprint $table) {
             $table->char('user_id', 36)->primary();
-            $table->string('job_title', 50);
+            $table->string('job_title', 255);
             $table->decimal('salary', 10, 2);
             $table->date('hire_date');
             $table->string('shift', 50);
-            $table->string('role', 50);
+            $table->string('role', 100);
             $table->foreign('user_id')->references('user_id')->on('app_user')->onDelete('CASCADE');
         });
     }

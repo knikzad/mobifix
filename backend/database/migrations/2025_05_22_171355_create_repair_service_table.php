@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('repair_service', function (Blueprint $table) {
             $table->char('service_id', 36)->primary();
-            $table->string('service_name', 100)->notNull();
+            $table->string('service_name', 255)->notNull();
             $table->text('description')->nullable();
             $table->decimal('price', 10, 2)->notNull();
             $table->integer('time_taken')->notNull();

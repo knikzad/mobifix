@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.9"
 
 services:
   mobifix-backend:
@@ -9,7 +9,9 @@ services:
     restart: unless-stopped
     working_dir: /var/www/html
     volumes:
-    - ./backend:/var/www/html
+      - ./backend:/var/www/html:cached
+    depends_on:
+      - mobifix-db
     networks:
       - mobifix-net
 

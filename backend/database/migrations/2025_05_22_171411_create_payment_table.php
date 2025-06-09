@@ -16,7 +16,7 @@ return new class extends Migration
             $table->char('payment_number', 36);
             $table->decimal('amount', 10, 2)->notNull();
             $table->string('payment_status', 10)->notNull();
-            $table->string('payment_method', 50)->notNull();
+            $table->string('payment_method', 255)->notNull();
             $table->timestamp('payment_date_time')->notNull();
 
             // Defining Composite Primary Key

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('device_model', function (Blueprint $table) {
             $table->char('model_id', 36)->primary();
-            $table->string('model_name', 100)->notNull();
+            $table->string('model_name', 255)->notNull();
             $table->integer('release_year')->notNull();
             $table->char('brand_id', 36)->notNull();
 

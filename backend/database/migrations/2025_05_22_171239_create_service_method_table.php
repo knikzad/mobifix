@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('service_method', function (Blueprint $table) {
             $table->char('method_id', 36)->primary();
-            $table->string('method_name', 50);
+            $table->string('method_name', 255);
             $table->integer('estimated_time')->notNull();
             $table->decimal('cost', 10, 2);
             $table->text('note')->nullable();

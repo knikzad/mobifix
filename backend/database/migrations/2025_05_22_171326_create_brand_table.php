@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('brand', function (Blueprint $table) {
             $table->char('brand_id', 36)->primary();
-            $table->string('brand_name', 100)->notNull();
-            $table->string('country', 50)->nullable();
+            $table->string('brand_name', 255)->notNull();
+            $table->string('country', 255)->nullable();
             $table->integer('founded_year')->nullable();
         });
     }
