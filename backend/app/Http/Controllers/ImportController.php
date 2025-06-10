@@ -33,7 +33,7 @@ class ImportController extends Controller
             $customers = [];
             $customerIds = [];
 
-            for ($i = 0; $i < 100; $i++) {
+            for ($i = 0; $i < 50; $i++) {
 
                 $salt = Str::random(32); // generate unique salt per user
                 $plainPassword = $faker->password;
@@ -85,7 +85,7 @@ class ImportController extends Controller
                     'password' => $hashedPassword,
                     'salt' => Str::random(32),
                     'user_type' => 'employee',
-                    'status' => $faker->randomElement(['active','inactive']),
+                    'status' => 'active',
                     'street_name' => $faker->streetName,
                     'house_number' => $faker->buildingNumber,
                     'city' => $faker->city,
@@ -106,31 +106,47 @@ class ImportController extends Controller
             DB::table('app_user')->insert($employees);
             DB::table('employee')->insert($employeeDetails);
 
-            // ==== 3. service_method (5 entries) ====
+            // ==== 3. service_method (3 entries) ====
 
             $serviceMethods = [];
             $methodIds = [];
 
-            for ($i = 0; $i < 5; $i++) {
-                $mid = (string) Str::uuid();
-                $serviceMethods[] = [
-                    'method_id' => $mid,
-                    'method_name' => $faker->word . ' Method',
-                    'estimated_time' => $faker->numberBetween(30, 180),
-                    'cost' => $faker->randomFloat(2, 20, 200),
-                    'note' => $faker->sentence,
-                ];
-                $methodIds[] = $mid;
+            $methodsData = [
+                [
+                    'method_name' => 'Pick-up & Delivery',
+                    'estimated_time' => 120,
+                    'cost' => 50.00,
+                    'note' => 'We pick up the device and deliver it after repair.',
+                ],
+                [
+                    'method_name' => 'Drop-off at Store',
+                    'estimated_time' => 90,
+                    'cost' => 0.00,
+                    'note' => 'Customer drops off the device at our service location.',
+                ],
+                [
+                    'method_name' => 'On-site Repair',
+                    'estimated_time' => 60,
+                    'cost' => 75.00,
+                    'note' => 'Technician visits the customer to perform the repair on-site.',
+                ],
+            ];
+
+            foreach ($methodsData as $data) {
+                $methodId = (string) Str::uuid();
+                $methodIds[] = $methodId;
+                $serviceMethods[] = array_merge($data, ['method_id' => $methodId]);
             }
 
             DB::table('service_method')->insert($serviceMethods);
 
-            // ==== 4. brand (10 entries) ====
+
+            // ==== 4. brand (5 entries) ====
 
             $brands = [];
             $brandIds = [];
 
-            for ($i = 0; $i < 10; $i++) {
+            for ($i = 0; $i < 3; $i++) {
                 $bid = (string) Str::uuid();
                 $brands[] = [
                     'brand_id' => $bid,
@@ -148,7 +164,7 @@ class ImportController extends Controller
             $deviceTypes = [];
             $dtIds = [];
 
-            for ($i = 0; $i < 8; $i++) {
+            for ($i = 0; $i < 3; $i++) {
                 $dt = (string) Str::uuid();
                 $deviceTypes[] = [
                     'device_type_id' => $dt,
@@ -182,7 +198,7 @@ class ImportController extends Controller
             $modelIds = [];
 
             foreach ($brandIds as $bid) {
-                for ($i = 0; $i < 5; $i++) {
+                for ($i = 0; $i < 2; $i++) {
                     $mid = (string) Str::uuid();
                     $deviceModels[] = [
                         'model_id' => $mid,

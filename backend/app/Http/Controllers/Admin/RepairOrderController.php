@@ -13,7 +13,15 @@ class RepairOrderController extends Controller
      */
     public function index()
     {
-        $repair_orders = DB::select("
+        // Retrieve the selected user from the session
+        $selectedUser = session('selected_user');
+
+        if (!$selectedUser) {
+            return redirect()->route('use_case.index')->withErrors('No user selected.');
+        }
+
+        // Build the query based on the user's role
+        $query = "
             SELECT
                 ra.appointment_id,
                 ra.date_time,
@@ -41,12 +49,40 @@ class RepairOrderController extends Controller
             LEFT JOIN app_user eu ON e.user_id = eu.user_id
             
             LEFT JOIN service_method sm ON ra.method_id = sm.method_id
-            
-            ORDER BY ra.date_time DESC
-        ");
+        ";
+
+        $conditions = [];
+        $params = [];
+
+        // Apply filtering logic based on user type and role
+        if ($selectedUser['user_type'] === 'employee') {
+            if ($selectedUser['role'] === 'admin') {
+                // Admin sees all repair appointments, no filter needed
+            } else {
+                // Technicians should only see appointments assigned to them
+                $conditions[] = "ra.employee_id = ?";
+                $params[] = $selectedUser['user_id'];
+            }
+        } elseif ($selectedUser['user_type'] === 'customer') {
+            // Customers should only see their own appointments
+            $conditions[] = "ra.customer_id = ?";
+            $params[] = $selectedUser['user_id'];
+        }
+
+        // Append WHERE conditions if applicable
+        if (!empty($conditions)) {
+            $query .= " WHERE " . implode(" AND ", $conditions);
+        }
+
+        // Ensure sorting remains intact
+        $query .= " ORDER BY ra.date_time DESC";
+
+        // Execute the query with filtering conditions
+        $repair_orders = DB::select($query, $params);
 
         return view('admin.repair-orders.index', ['repair_orders' => $repair_orders]);
     }
+
 
 
 

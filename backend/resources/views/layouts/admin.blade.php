@@ -93,11 +93,20 @@
 
                     {{-- Analytics --}}
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('admin.analytics.*') ? 'active' : '' }}"
-                           href="{{ route('admin.analytics.index') }}">
-                            Analytics
+                        <a class="nav-link {{ request()->routeIs('use_case.analytics.report') ? 'active' : '' }}"
+                        href="{{ route('use_case.analytics.report') }}">
+                            Khalifa Analytics Report
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('use_case.index') ? 'active' : '' }}"
+                        href="{{ route('use_case.index') }}">
+                            Khalifa Use Case
+                        </a>
+                    </li>
+
+
+
 
                 </ul>
             </div>
