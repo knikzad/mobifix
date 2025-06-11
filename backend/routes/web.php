@@ -5,6 +5,7 @@ use App\Http\Controllers\ImportController;
 use App\Http\Controllers\Admin\HomeController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Student2Khalifa\UseCaseController;
+use App\Http\Controllers\Student1Mustafa\PaymentController;
 
 Route::get('/', function () {
     return view('admin.tools.import');
@@ -89,3 +90,19 @@ Route::prefix('customer')->name('customer.')->group(function () {
     Route::get('/profile', [UseCaseController::class, 'customerProfile'])->name('profile');
 
 });
+
+
+// =======================================================
+// Student 1 Mustafa Specific Part
+
+Route::get('/mustafa/analytics-report', [PaymentController::class, 'analyticsReport'])->name('mustafa.analytics.report');
+
+Route::get('/mustafa/use-case', [PaymentController::class, 'useCasePage'])->name('mustafa.use_case.page');
+Route::post('/mustafa/use-case/pay', [PaymentController::class, 'processUserAppointmentPayment'])->name('mustafa.use_case.pay');
+
+
+// Show payment form
+Route::get('/mustafa/use-case/pay/{appointment_id}', [PaymentController::class, 'showPaymentForm'])->name('mustafa.use_case.pay_form');
+
+// Process payment form submission
+Route::post('/mustafa/use-case/pay', [PaymentController::class, 'processUserAppointmentPayment'])->name('mustafa.use_case.pay');

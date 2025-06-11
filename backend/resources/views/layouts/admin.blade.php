@@ -95,15 +95,32 @@
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('use_case.analytics.report') ? 'active' : '' }}"
                         href="{{ route('use_case.analytics.report') }}">
-                            Khalifa Analytics Report
+                            Appointment Analytics Report
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('use_case.index') ? 'active' : '' }}"
                         href="{{ route('use_case.index') }}">
-                            Khalifa Use Case
+                            Appointment Use Case
                         </a>
                     </li>
+
+
+                    {{-- Mustafa --}}
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('mustafa.use_case.page') ? 'active' : '' }}"
+                        href="{{ route('mustafa.use_case.page') }}">
+                            Payment Use Case
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('mustafa.analytics.report') ? 'active' : '' }}"
+                        href="{{ route('mustafa.analytics.report') }}">
+                            Payment Analytics Report
+                        </a>
+                    </li>
+
 
 
 

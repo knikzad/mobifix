@@ -72,11 +72,11 @@
                         </a>
                     </li>
 
-                    {{-- Customer Profile --}}
+                    {{-- Mustafa --}}
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('customer.profile') ? 'active' : '' }}"
-                           href="{{ route('customer.profile') }}">
-                            My Profile
+                        <a class="nav-link {{ request()->routeIs('mustafa.use_case.page') ? 'active' : '' }}"
+                        href="{{ route('mustafa.use_case.page') }}">
+                            Payment Use Case
                         </a>
                     </li>
 
