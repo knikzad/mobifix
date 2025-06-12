@@ -20,6 +20,15 @@
                 </div>
             </div>
 
+            <div class="d-flex justify-content-center mt-4 mb-4">
+                <form action="{{ route('nosql.clear_and_migrate') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="btn btn-danger mt-3">
+                        🔁 Migrate SQL → MongoDB
+                    </button>
+                </form>
+            </div>
+
             <!-- Footer -->
             <div class="text-center mt-4">
                 <small class="text-muted">Mobifix Development &mdash; Import Random Data Interface</small>

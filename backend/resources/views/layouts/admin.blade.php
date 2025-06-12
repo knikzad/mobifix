@@ -134,15 +134,6 @@
 
         {{-- Main Content --}}
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-
-        <div class="d-flex justify-content-center mt-4 mb-4">
-            <form action="{{ route('nosql.clear_and_migrate') }}" method="POST">
-                @csrf
-                <button type="submit" class="btn btn-danger mt-3">
-                    🔁 Migrate SQL → MongoDB
-                </button>
-            </form>
-        </div>
         
             @yield('content')
         </main>
