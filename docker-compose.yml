@@ -12,9 +12,17 @@ services:
       - ./backend:/var/www/html:cached
     depends_on:
       - mobifix-db
-      - mobifix-mongo # ← added MongoDB dependency
+      - mobifix-mongo
     networks:
       - mobifix-net
+
+    # ✅ Added this line to run migrations automatically and start PHP
+    command: >
+      sh -c "
+        composer install &&
+        php artisan migrate --force &&
+        php-fpm
+      "
 
   mobifix-db:
     image: mariadb:10.7
@@ -46,15 +54,12 @@ services:
     networks:
       - mobifix-net
 
-  # --------------------
-  # MongoDB Service for NoSQL Part
-  # --------------------
   mobifix-mongo:
     image: mongo:latest
     container_name: mobifix-mongo
     restart: unless-stopped
     ports:
-      - "27017:27017" # ← optional if you want to connect from Compass
+      - "27017:27017"
     volumes:
       - mongo-data:/data/db
     networks:
@@ -62,7 +67,7 @@ services:
 
 volumes:
   db-data:
-  mongo-data: # ← volume to persist MongoDB data
+  mongo-data:
 
 networks:
   mobifix-net:
