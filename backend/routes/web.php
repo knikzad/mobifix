@@ -106,3 +106,7 @@ Route::get('/mustafa/use-case/pay/{appointment_id}', [PaymentController::class, 
 
 // Process payment form submission
 Route::post('/mustafa/use-case/pay', [PaymentController::class, 'processUserAppointmentPayment'])->name('mustafa.use_case.pay');
+
+
+Route::get('/mustafa/pending-payments', [PaymentController::class, 'pendingPaymentsPage'])->name('mustafa.pendingPayments');
+Route::post('/mustafa/confirm-payment', [PaymentController::class, 'confirmPayment'])->name('mustafa.confirmPayment');

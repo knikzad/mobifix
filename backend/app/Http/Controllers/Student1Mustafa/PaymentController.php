@@ -128,5 +128,32 @@ public function processUserAppointmentPayment(Request $request)
     }
 
 
+    // ++++++++++++++++++++++++++++++++++++++++++
+    public function pendingPaymentsPage()
+    {
+        // Fetch all unpaid (Pending) payments
+        $pendingPayments = DB::table('payment AS p')
+            ->join('repair_appointment AS ra', 'p.appointment_id', '=', 'ra.appointment_id')
+            ->join('app_user AS au', 'ra.customer_id', '=', 'au.user_id')
+            ->where('p.payment_status', 'Pending') // Only Pending payments
+            ->select('p.appointment_id', 'p.amount', 'p.payment_method', 'au.first_name', 'au.last_name')
+            ->get();
+
+        return view('student1mustafa.pending_payments', compact('pendingPayments'));
+    }
+
+    public function confirmPayment(Request $request)
+    {
+        $request->validate([
+            'appointment_id' => 'required|exists:payment,appointment_id',
+        ]);
+
+        DB::table('payment')
+            ->where('appointment_id', $request->appointment_id)
+            ->update(['payment_status' => 'Paid', 'payment_date_time' => now()]);
+
+        return redirect()->route('mustafa.pendingPayments')->with('success', 'Payment confirmed successfully!');
+    }
+
 
 }

@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container mt-4">
-    <h2 class="text-center mb-4">Mustafa Payment Analytics Report</h2>
+    <h2 class="text-center mb-4">Payment Analytics Report</h2>
 
     @if(count($results) > 0)
         <div class="table-responsive">

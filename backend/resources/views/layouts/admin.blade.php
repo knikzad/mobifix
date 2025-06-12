@@ -121,6 +121,13 @@
                         </a>
                     </li>
 
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('mustafa.pendingPayments') ? 'active' : '' }}"
+                        href="{{ route('mustafa.pendingPayments') }}">
+                            Pending Payments
+                        </a>
+                    </li>
+
 
 
 
