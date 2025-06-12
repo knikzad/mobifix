@@ -38,5 +38,14 @@ RUN chown -R www-data:www-data /var/www \
 # EXPOSE port used by php-fpm (if needed for debugging)
 EXPOSE 9000
 
+
+# -----------------------------------------------
+# Install MongoDB extension for PHP (ext-mongodb)
+# -----------------------------------------------
+RUN apt-get update && apt-get install -y libssl-dev pkg-config && \
+    pecl install mongodb && \
+    docker-php-ext-enable mongodb
+
+
 # Run PHP-FPM
 CMD ["php-fpm"]

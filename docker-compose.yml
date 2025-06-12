@@ -12,6 +12,7 @@ services:
       - ./backend:/var/www/html:cached
     depends_on:
       - mobifix-db
+      - mobifix-mongo # ← added MongoDB dependency
     networks:
       - mobifix-net
 
@@ -45,8 +46,23 @@ services:
     networks:
       - mobifix-net
 
+  # --------------------
+  # MongoDB Service for NoSQL Part
+  # --------------------
+  mobifix-mongo:
+    image: mongo:latest
+    container_name: mobifix-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017" # ← optional if you want to connect from Compass
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - mobifix-net
+
 volumes:
   db-data:
+  mongo-data: # ← volume to persist MongoDB data
 
 networks:
   mobifix-net:

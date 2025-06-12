@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\HomeController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Student2Khalifa\UseCaseController;
 use App\Http\Controllers\Student1Mustafa\PaymentController;
+use App\Http\Controllers\NoSQL\MongoImportController; //nosql route 
+
 
 Route::get('/', function () {
     return view('admin.tools.import');
@@ -110,3 +112,12 @@ Route::post('/mustafa/use-case/pay', [PaymentController::class, 'processUserAppo
 
 Route::get('/mustafa/pending-payments', [PaymentController::class, 'pendingPaymentsPage'])->name('mustafa.pendingPayments');
 Route::post('/mustafa/confirm-payment', [PaymentController::class, 'confirmPayment'])->name('mustafa.confirmPayment');
+
+
+//====================================================noSQL routes
+
+Route::get('/nosql/migrate', [MongoImportController::class, 'importAppointmentsToMongo'])->name('nosql.migrate');
+
+
+Route::get('/nosql/migrate', [MongoImportController::class, 'importAppointmentsToMongo'])->name('nosql.migrate');
+Route::post('/nosql/clear-and-migrate', [MongoImportController::class, 'clearAndMigrate'])->name('nosql.clear_and_migrate');
