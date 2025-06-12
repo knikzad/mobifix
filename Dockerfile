@@ -32,14 +32,10 @@ RUN apt-get update && apt-get install -y \
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy custom entrypoint
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
-
 # Set correct permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
 
 EXPOSE 9000
-ENTRYPOINT ["entrypoint.sh"]
+
 CMD ["php-fpm"]
