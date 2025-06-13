@@ -19,14 +19,14 @@
                     <div id="alert-container" class="mt-4"></div>
                 </div>
             </div>
-
+        <div class="d-flex justify-content-center mt-4 mb-4">
             <form action="{{ route('mongo-migrate') }}" method="POST">
                 @csrf
                 <button type="submit" class="btn btn-danger mt-3">
                     🔁 Migrate SQL → MongoDB
                 </button>
             </form>
-
+        </div>
 
             <!-- Footer -->
             <div class="text-center mt-4">
