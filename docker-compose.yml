@@ -15,15 +15,14 @@ services:
       - mobifix-mongo
     networks:
       - mobifix-net
-    environment:
-      DB_CONNECTION: mysql
-      DB_HOST: mobifix-db
-      DB_PORT: 3306
-      DB_DATABASE: mobifix
-      DB_USERNAME: mobifixuser
-      DB_PASSWORD: mobifixpass
-      MONGO_DB_HOST: mobifix-mongo
-      MONGO_DB_PORT: 27017
+
+    # ✅ Added this line to run migrations automatically and start PHP
+    command: >
+      sh -c "
+        composer install &&
+        php artisan migrate --force &&
+        php-fpm
+      "
 
   mobifix-db:
     image: mariadb:10.7
