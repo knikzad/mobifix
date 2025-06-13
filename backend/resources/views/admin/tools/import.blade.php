@@ -20,14 +20,13 @@
                 </div>
             </div>
 
-            <div class="d-flex justify-content-center mt-4 mb-4">
-                <form action="{{ route('nosql.clear_and_migrate') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="btn btn-danger mt-3">
-                        🔁 Migrate SQL → MongoDB
-                    </button>
-                </form>
-            </div>
+            <form action="{{ route('mongo-migrate') }}" method="POST">
+                @csrf
+                <button type="submit" class="btn btn-danger mt-3">
+                    🔁 Migrate SQL → MongoDB
+                </button>
+            </form>
+
 
             <!-- Footer -->
             <div class="text-center mt-4">
