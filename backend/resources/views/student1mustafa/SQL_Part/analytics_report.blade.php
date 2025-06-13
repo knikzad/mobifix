@@ -9,6 +9,7 @@
             <table class="table table-striped table-bordered text-center">
                 <thead class="table-dark">
                     <tr>
+                        <th>#</th> {{-- Serial Number --}}
                         <th>Customer Name</th>
                         <th>Contact Method</th>
                         <th>Payment Method</th>
@@ -19,6 +20,7 @@
                 <tbody>
                     @foreach($results as $row)
                         <tr>
+                            <td>{{ $loop->iteration }}</td> {{-- This auto-generates 1, 2, 3... --}}
                             <td>{{ $row->first_name }} {{ $row->last_name }}</td>
                             <td>{{ $row->preferred_contact_method }}</td>
                             <td>{{ $row->payment_method }}</td>

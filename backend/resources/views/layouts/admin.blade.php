@@ -136,6 +136,21 @@
                         </a>
                     </li>
 
+                    {{-- Mustafa NoSQL --}}
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('mustafa.nosql.use_case') ? 'active' : '' }}"
+                        href="{{ route('mustafa.nosql.use_case') }}">
+                            Mustafa NoSQL Use Case
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('mustafa.nosql.analytics') ? 'active' : '' }}"
+                        href="{{ route('mustafa.nosql.analytics') }}">
+                            Mustafa NoSQL Analytics
+                        </a>
+                    </li>
+
+
                 </ul>
             </div>
         </nav>
