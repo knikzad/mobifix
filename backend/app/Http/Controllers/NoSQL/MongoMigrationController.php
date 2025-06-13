@@ -24,8 +24,9 @@ class MongoMigrationController extends Controller
         $this->migrateRepairServices();
         $this->migrateAppointments();
 
-        return response()->json(['message' => 'Full migration to MongoDB completed successfully.']);
+        return redirect()->route('admin.home')->with('success', 'Full migration to MongoDB completed successfully.');
     }
+
 
     protected function clearAll()
     {

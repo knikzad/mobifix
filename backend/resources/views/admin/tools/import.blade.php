@@ -19,14 +19,24 @@
                     <div id="alert-container" class="mt-4"></div>
                 </div>
             </div>
-        <div class="d-flex justify-content-center mt-4 mb-4">
-            <form action="{{ route('mongo-migrate') }}" method="POST">
-                @csrf
-                <button type="submit" class="btn btn-danger mt-3">
-                    🔁 Migrate SQL → MongoDB
-                </button>
-            </form>
-        </div>
+
+            <!-- Migrate Button with Loading -->
+            <div class="d-flex justify-content-center mt-4 mb-4">
+                <form id="migrate-form" action="{{ route('mongo-migrate') }}" method="POST">
+                    @csrf
+                    <button type="submit" id="migrate-btn" class="btn btn-danger mt-3">
+                        🔁 Migrate SQL → MongoDB
+                    </button>
+                </form>
+            </div>
+
+            <!-- Success Alert -->
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
 
             <!-- Footer -->
             <div class="text-center mt-4">
@@ -35,4 +45,13 @@
         </div>
     </div>
 </div>
+
+<!-- Script to handle loading state -->
+<script>
+    document.getElementById('migrate-form').addEventListener('submit', function () {
+        const btn = document.getElementById('migrate-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Migrating...';
+    });
+</script>
 @endsection
