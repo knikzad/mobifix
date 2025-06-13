@@ -8,10 +8,6 @@ use App\Http\Controllers\Student1Mustafa\PaymentController;
 use App\Http\Controllers\NoSQL\MongoMigrationController;
 use App\Http\Controllers\Student2Khalifa\UseCaseController as SqlUseCaseController;
 use App\Http\Controllers\NoSQL\Student2khalifa\UseCaseController as NoSqlUseCaseController;
-use App\Http\Controllers\NoSQL\Student1Mustafa\MustafaNoSQLController;
-
-
-
 
 Route::get('/', function () {
     return view('admin.tools.import');
