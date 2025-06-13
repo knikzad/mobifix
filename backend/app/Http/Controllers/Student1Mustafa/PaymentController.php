@@ -25,13 +25,13 @@ class PaymentController extends Controller
             JOIN customer c ON u.user_id = c.user_id
             JOIN repair_appointment r ON c.user_id = r.customer_id
             JOIN payment p ON r.appointment_id = p.appointment_id
-            WHERE r.status = 'Completed' AND p.payment_status = 'paid'
+            WHERE r.status = 'completed' AND p.payment_status = 'paid'
             ORDER BY r.date_time DESC
         ");
 
 
 
-        return view('student1mustafa.analytics_report', compact('results'));
+        return view('student1mustafa.SQL_Part.analytics_report', compact('results'));
     }
 
 
@@ -47,7 +47,7 @@ class PaymentController extends Controller
             ->where('ra.status', 'completed') // Only completed appointments
             ->where(function ($query) {
                 $query->whereNull('p.payment_status') // Include unpaid records (null)
-                    ->orWhere('p.payment_status', '<>', 'Paid'); // Explicitly exclude paid
+                    ->orWhere('p.payment_status', '<>', 'paid'); // Explicitly exclude paid
             })
             ->select('app_user.user_id', 'app_user.first_name', 'app_user.last_name')
             ->distinct() // Ensure unique customer records
@@ -61,12 +61,12 @@ class PaymentController extends Controller
         $appointments = DB::table('repair_appointment AS ra')
             ->leftJoin('payment AS p', 'ra.appointment_id', '=', 'p.appointment_id')
             ->where('ra.customer_id', $request->user_id)
-            ->Where('p.payment_status', '<>', 'Paid')
+            ->Where('p.payment_status', '<>', 'paid')
             ->Where('ra.status', 'completed')
             ->get();
          }
 
-        return view('student1mustafa.use_case', [
+        return view('student1mustafa.SQL_Part.use_case', [
             'customers' => $customers,
             'appointments' => $appointments,
             'selectedUserId' => $request->user_id,
@@ -90,7 +90,7 @@ public function processUserAppointmentPayment(Request $request)
         ->first();
 
     // Determine payment status based on method
-    $paymentStatus = ($request->payment_method === 'Cash') ? 'Pending' : 'Paid';
+    $paymentStatus = ($request->payment_method === 'Cash') ? 'pending' : 'paid';
 
     if ($existingPayment) {
         // Update payment status if payment already exists
@@ -124,7 +124,7 @@ public function processUserAppointmentPayment(Request $request)
             return redirect()->route('mustafa.use_case.page')->with('error', 'Appointment not found.');
         }
 
-        return view('student1mustafa.pay_form', compact('appointment'));
+        return view('student1mustafa.SQL_Part.pay_form', compact('appointment'));
     }
 
 
@@ -135,11 +135,11 @@ public function processUserAppointmentPayment(Request $request)
         $pendingPayments = DB::table('payment AS p')
             ->join('repair_appointment AS ra', 'p.appointment_id', '=', 'ra.appointment_id')
             ->join('app_user AS au', 'ra.customer_id', '=', 'au.user_id')
-            ->where('p.payment_status', 'Pending') // Only Pending payments
+            ->where('p.payment_status', 'pending') // Only Pending payments
             ->select('p.appointment_id', 'p.amount', 'p.payment_method', 'au.first_name', 'au.last_name')
             ->get();
 
-        return view('student1mustafa.pending_payments', compact('pendingPayments'));
+        return view('student1mustafa.SQL_Part.pending_payments', compact('pendingPayments'));
     }
 
     public function confirmPayment(Request $request)
@@ -150,7 +150,7 @@ public function processUserAppointmentPayment(Request $request)
 
         DB::table('payment')
             ->where('appointment_id', $request->appointment_id)
-            ->update(['payment_status' => 'Paid', 'payment_date_time' => now()]);
+            ->update(['payment_status' => 'paid', 'payment_date_time' => now()]);
 
         return redirect()->route('mustafa.pendingPayments')->with('success', 'Payment confirmed successfully!');
     }

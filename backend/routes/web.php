@@ -8,6 +8,10 @@ use App\Http\Controllers\Student1Mustafa\PaymentController;
 use App\Http\Controllers\NoSQL\MongoMigrationController;
 use App\Http\Controllers\Student2Khalifa\UseCaseController as SqlUseCaseController;
 use App\Http\Controllers\NoSQL\Student2khalifa\UseCaseController as NoSqlUseCaseController;
+use App\Http\Controllers\NoSQL\Student1Mustafa\MustafaNoSQLController;
+
+
+
 
 Route::get('/', function () {
     return view('admin.tools.import');
@@ -113,6 +117,16 @@ Route::post('/mustafa/use-case/pay', [PaymentController::class, 'processUserAppo
 
 Route::get('/mustafa/pending-payments', [PaymentController::class, 'pendingPaymentsPage'])->name('mustafa.pendingPayments');
 Route::post('/mustafa/confirm-payment', [PaymentController::class, 'confirmPayment'])->name('mustafa.confirmPayment');
+
+//+++++++++++nosql mustafa
+
+Route::get('/mustafa-nosql/analytics', [MustafaNoSQLController::class, 'analyticsReport'])->name('mustafa.nosql.analytics');
+Route::get('/mustafa-nosql/use-case', [MustafaNoSQLController::class, 'useCasePage'])->name('mustafa.nosql.use_case');
+Route::post('/mustafa-nosql/use-case/pay', [MustafaNoSQLController::class, 'processPayment'])->name('mustafa.nosql.use_case.pay');
+
+Route::get('/mustafa-nosql/use-case', [MustafaNoSQLController::class, 'useCasePage'])->name('mustafa.nosql.use_case');
+Route::get('/mustafa-nosql/pay/{appointment_id}', [MustafaNoSQLController::class, 'showPaymentForm'])->name('mustafa.nosql.pay.form');
+Route::post('/mustafa-nosql/pay', [MustafaNoSQLController::class, 'processPayment'])->name('mustafa.nosql.pay.submit');
 
 
 //====================================================noSQL routes
