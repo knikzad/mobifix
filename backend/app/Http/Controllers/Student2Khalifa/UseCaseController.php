@@ -180,83 +180,31 @@ class UseCaseController extends Controller
 
 
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+public function analyticsReport()
+{
+    $report = DB::select("
+        SELECT 
+            sm.method_name,
+            COUNT(DISTINCT ra.appointment_id) AS total_appointments,
+            ROUND(AVG(ra.total_price), 2) AS avg_repair_price,
+            ROUND(SUM(ra.total_price), 2) AS total_revenue,
+            COUNT(DISTINCT ra.customer_id) AS unique_customers
+        FROM 
+            repair_appointment ra
+        JOIN 
+            service_method sm ON ra.method_id = sm.method_id
+        WHERE 
+            ra.date_time >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)
+        GROUP BY 
+            sm.method_name
+        ORDER BY 
+            total_revenue DESC
+    ");
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
+    return view('student2khalifa.admin.analytics_report', ['stats' => $report]);
+}
 
 
-    public function analyticsReport()
-    {
-        $report = DB::select("
-            SELECT 
-                au.first_name AS employee_first_name,
-                au.last_name AS employee_last_name,
-                sm.method_name,
-                COUNT(ra.appointment_id) AS completed_appointments,
-                AVG(ra.total_price) AS avg_repair_price,
-                SUM(ra.total_price) AS total_revenue
-            FROM 
-                repair_appointment ra
-            LEFT JOIN 
-                employee e ON ra.employee_id = e.user_id
-            LEFT JOIN
-                service_method sm ON ra.method_id = sm.method_id
-            LEFT JOIN 
-                app_user au ON e.user_id = au.user_id
-            WHERE 
-                ra.date_time >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)
-            GROUP BY 
-                au.first_name, au.last_name, sm.method_name
-            ORDER BY
-                au.user_id, total_revenue DESC;
-        ");
-
-        return view('student2khalifa.admin.analytics_report', ['stats' => $report]);
-    }
 
 
 }
