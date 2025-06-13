@@ -95,9 +95,17 @@
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('use_case.analytics.report') ? 'active' : '' }}"
                         href="{{ route('use_case.analytics.report') }}">
-                            Appointment Analytics Report
+                            Appointment Analytics Report (SQL)
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('nosql.use_case.analytics.report') ? 'active' : '' }}"
+                        href="{{ route('nosql.use_case.analytics.report') }}">
+                            Appointment Analytics Report (NoSQL)
+                        </a>
+                    </li>
+
+
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('use_case.index') ? 'active' : '' }}"
                         href="{{ route('use_case.index') }}">

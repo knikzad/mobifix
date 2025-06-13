@@ -4,10 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\Admin\HomeController;
 use App\Http\Controllers\Admin\EmployeeController;
-use App\Http\Controllers\Student2Khalifa\UseCaseController;
 use App\Http\Controllers\Student1Mustafa\PaymentController;
 use App\Http\Controllers\NoSQL\MongoMigrationController;
-
+use App\Http\Controllers\Student2Khalifa\UseCaseController as SqlUseCaseController;
+use App\Http\Controllers\NoSQL\Student2khalifa\UseCaseController as NoSqlUseCaseController;
 
 Route::get('/', function () {
     return view('admin.tools.import');
@@ -54,19 +54,20 @@ Route::post('/import-random-data', [ImportController::class, 'import']);
 // =======================================================
 // Student 2 Khalifa Specific Par
 
+// SQL routes
 Route::prefix('use-case')->name('use_case.')->group(function () {
+    Route::get('/', [SqlUseCaseController::class, 'index'])->name('index');
+    Route::post('/select_user', [SqlUseCaseController::class, 'selectUser'])->name('selectUser');
+    Route::get('/analytics_report', [SqlUseCaseController::class, 'analyticsReport'])->name('analytics.report');
+    Route::get('/appointment/create', [SqlUseCaseController::class, 'createAppointment'])->name('appointment.create');
+});
 
-    // Display the user selection page
-    Route::get('/', [UseCaseController::class, 'index'])->name('index');
-
-    // Handle user selection and store it in a session
-    Route::post('/select_user', [UseCaseController::class, 'selectUser'])->name('selectUser');
-
-    // Generate analytics report
-    Route::get('/analytics_report', [UseCaseController::class, 'analyticsReport'])->name('analytics.report');
-
-    // Customer appointment booking page
-    Route::get('/appointment/create', [UseCaseController::class, 'createAppointment'])->name('appointment.create');
+// NoSQL routes
+Route::prefix('nosql/use-case')->name('nosql.use_case.')->group(function () {
+    Route::get('/', [NoSqlUseCaseController::class, 'index'])->name('index');
+    Route::post('/select_user', [NoSqlUseCaseController::class, 'selectUser'])->name('selectUser');
+    Route::get('/analytics_report', [NoSqlUseCaseController::class, 'analyticsReport'])->name('analytics.report');
+    Route::get('/appointment/create', [NoSqlUseCaseController::class, 'createAppointment'])->name('appointment.create');
 });
 
 
@@ -79,17 +80,17 @@ Route::prefix('customer')->name('customer.')->group(function () {
     })->name('dashboard');
 
     // Appointment booking page (form wizard)
-    Route::get('/appointment/create', [UseCaseController::class, 'createAppointment'])->name('appointment.create');
+    Route::get('/appointment/create', [SqlUseCaseController::class, 'createAppointment'])->name('appointment.create');
 
     // store the created appointment
-    Route::post('/appointment/store', [UseCaseController::class, 'storeAppointment'])->name('appointment.store');
+    Route::post('/appointment/store', [SqlUseCaseController::class, 'storeAppointment'])->name('appointment.store');
 
 
     // Customer's appointments list
-    Route::get('/appointments', [UseCaseController::class, 'listAppointments'])->name('appointments');
+    Route::get('/appointments', [SqlUseCaseController::class, 'listAppointments'])->name('appointments');
 
     // Customer profile
-    Route::get('/profile', [UseCaseController::class, 'customerProfile'])->name('profile');
+    Route::get('/profile', [SqlUseCaseController::class, 'customerProfile'])->name('profile');
 
 });
 
