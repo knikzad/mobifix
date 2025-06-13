@@ -22,7 +22,7 @@ class UseCaseController extends Controller
             ORDER BY au.user_type = 'employee' DESC, au.first_name ASC
         ");
 
-        return view('student2khalifa.admin.user_selection', ['users' => $users]);
+        return view('student2khalifa.SQL.admin.user_selection', ['users' => $users]);
     }
 
     public function selectUser(Request $request)
@@ -90,7 +90,7 @@ class UseCaseController extends Controller
             WHERE au.user_id = ?
         ", [$selectedUser['user_id']]);
 
-        return view('student2khalifa.customer.create_appointment', [
+        return view('student2khalifa.SQL.customer.create_appointment', [
             'repairServices' => $repairServices,
             'serviceMethods' => $serviceMethods,
             'customerDetails' => $customerDetails
@@ -175,34 +175,34 @@ class UseCaseController extends Controller
             ORDER BY ra.date_time DESC
         ", [$selectedUser['user_id']]);
 
-        return view('student2khalifa.customer.appointments', ['appointments' => $appointments]);
+        return view('student2khalifa.SQL.customer.appointments', ['appointments' => $appointments]);
     }
 
 
 
-public function analyticsReport()
-{
-    $report = DB::select("
-        SELECT 
-            sm.method_name,
-            COUNT(DISTINCT ra.appointment_id) AS total_appointments,
-            ROUND(AVG(ra.total_price), 2) AS avg_repair_price,
-            ROUND(SUM(ra.total_price), 2) AS total_revenue,
-            COUNT(DISTINCT ra.customer_id) AS unique_customers
-        FROM 
-            repair_appointment ra
-        JOIN 
-            service_method sm ON ra.method_id = sm.method_id
-        WHERE 
-            ra.date_time >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)
-        GROUP BY 
-            sm.method_name
-        ORDER BY 
-            total_revenue DESC
-    ");
+    public function analyticsReport()
+    {
+        $report = DB::select("
+            SELECT 
+                sm.method_name,
+                COUNT(DISTINCT ra.appointment_id) AS total_appointments,
+                ROUND(AVG(ra.total_price), 2) AS avg_repair_price,
+                ROUND(SUM(ra.total_price), 2) AS total_revenue,
+                COUNT(DISTINCT ra.customer_id) AS unique_customers
+            FROM 
+                repair_appointment ra
+            JOIN 
+                service_method sm ON ra.method_id = sm.method_id
+            WHERE 
+                ra.date_time >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)
+            GROUP BY 
+                sm.method_name
+            ORDER BY 
+                total_revenue DESC
+        ");
 
-    return view('student2khalifa.admin.analytics_report', ['stats' => $report]);
-}
+        return view('student2khalifa.SQL.admin.analytics_report', ['stats' => $report]);
+    }
 
 
 

@@ -26,17 +26,17 @@
 
                 @foreach ($stats as $index => $row)
                     @php
-                        $totalAppointmentsSum += $row->total_appointments;
-                        $totalRevenueSum += $row->total_revenue;
-                        $uniqueCustomersSum += $row->unique_customers;
+                        $totalAppointmentsSum += $row['total_appointments'];
+                        $totalRevenueSum += $row['total_revenue'];
+                        $uniqueCustomersSum += $row['unique_customers'];
                     @endphp
                     <tr>
                         <td>{{ $index + 1 }}</td>
-                        <td>{{ $row->method_name }}</td>
-                        <td>{{ $row->total_appointments }}</td>
-                        <td>{{ number_format($row->avg_repair_price, 2) }}</td>
-                        <td>{{ number_format($row->total_revenue, 2) }}</td>
-                        <td>{{ $row->unique_customers }}</td>
+                        <td>{{ $row['method_name'] }}</td>
+                        <td>{{ $row['total_appointments'] }}</td>
+                        <td>{{ number_format($row['avg_repair_price'], 2) }}</td>
+                        <td>{{ number_format($row['total_revenue'], 2) }}</td>
+                        <td>{{ $row['unique_customers'] }}</td>
                     </tr>
                 @endforeach
 
@@ -53,7 +53,7 @@
     </div>
     @else
         <div class="alert alert-warning text-center">
-            No completed repair appointment data available.
+            No repair appointment data available.
         </div>
     @endif
 </div>
