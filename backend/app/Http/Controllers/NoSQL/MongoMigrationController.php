@@ -5,6 +5,7 @@ namespace App\Http\Controllers\NoSQL;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use MongoDB\Client as MongoClient;
+use MongoDB\BSON\UTCDateTime;
 
 class MongoMigrationController extends Controller
 {
@@ -50,6 +51,16 @@ class MongoMigrationController extends Controller
                 'last_name' => $user->last_name,
                 'email' => $user->email,
                 'phone' => $user->phone,
+                'password' => $user->password,
+                'salt' => $user->salt,
+                'user_type' => $user->user_type,
+                'status' => $user->status,
+                'address' => [
+                    'street_name' => $user->street_name,
+                    'house_number' => $user->house_number,
+                    'city' => $user->city,
+                    'postal_code' => $user->postal_code,
+                ],
             ];
 
             $customer = DB::table('customer')->where('user_id', $user->user_id)->first();
@@ -58,7 +69,7 @@ class MongoMigrationController extends Controller
             if ($customer) {
                 $doc['customer'] = [
                     'preferred_contact_method' => $customer->preferred_contact_method,
-                    'loyalty_points' => $customer->loyalty_points
+                    'loyalty_points' => (int) $customer->loyalty_points,
                 ];
             }
 
@@ -66,13 +77,16 @@ class MongoMigrationController extends Controller
                 $doc['employee'] = [
                     'job_title' => $employee->job_title,
                     'shift' => $employee->shift,
-                    'role' => $employee->role
+                    'role' => $employee->role,
+                    'salary' => (float) $employee->salary,
+                    'hire_date' => new UTCDateTime(strtotime($employee->hire_date) * 1000),
                 ];
             }
 
             $this->mongo->users->insertOne($doc);
         }
     }
+
 
     protected function migrateDeviceData()
     {
@@ -82,7 +96,8 @@ class MongoMigrationController extends Controller
             $this->mongo->brand->insertOne([
                 '_id' => $b->brand_id,
                 'brand_name' => $b->brand_name,
-                'country' => $b->country
+                'country' => $b->country,
+                'founded_year' => $b->founded_year !== null ? (int) $b->founded_year : null,
             ]);
         }
 
@@ -91,7 +106,8 @@ class MongoMigrationController extends Controller
         foreach ($deviceTypes as $dt) {
             $this->mongo->device_type->insertOne([
                 '_id' => $dt->device_type_id,
-                'type_name' => $dt->type_name
+                'type_name' => $dt->type_name,
+                'description' => $dt->description,
             ]);
         }
 
@@ -110,7 +126,7 @@ class MongoMigrationController extends Controller
             $this->mongo->device_model->insertOne([
                 '_id' => $m->model_id,
                 'model_name' => $m->model_name,
-                'release_year' => $m->release_year,
+                'release_year' => (int) $m->release_year,
                 'brand_id' => $m->brand_id
             ]);
         }
@@ -124,8 +140,9 @@ class MongoMigrationController extends Controller
             $this->mongo->repair_service->insertOne([
                 '_id' => $s->service_id,
                 'service_name' => $s->service_name,
-                'price' => $s->price,
-                'time_taken' => $s->time_taken,
+                'description' => $s->description,
+                'price' => (float) $s->price,
+                'time_taken' => (int) $s->time_taken,
                 'model_id' => $s->model_id
             ]);
         }
@@ -143,24 +160,24 @@ class MongoMigrationController extends Controller
 
             $doc = [
                 '_id' => $appt->appointment_id,
-                'date_time' => $appt->date_time,
+                'date_time' => new UTCDateTime(strtotime($appt->date_time) * 1000),
                 'status' => $appt->status,
-                'total_price' => $appt->total_price,
+                'total_price' => (float) $appt->total_price,
                 'customer_id' => $appt->customer_id,
                 'employee_id' => $appt->employee_id,
                 'service_method' => $method ? [
                     'method_id' => $method->method_id,
                     'method_name' => $method->method_name,
-                    'estimated_time' => $method->estimated_time,
-                    'cost' => $method->cost,
+                    'estimated_time' => (int) $method->estimated_time,
+                    'cost' => (float) $method->cost,
                     'note' => $method->note
                 ] : null,
                 'payment' => $payment ? [
                     'payment_number' => $payment->payment_number,
-                    'amount' => $payment->amount,
+                    'amount' => (float) $payment->amount,
                     'payment_method' => $payment->payment_method,
                     'payment_status' => $payment->payment_status,
-                    'payment_date_time' => $payment->payment_date_time
+                    'payment_date_time' => new UTCDateTime(strtotime($payment->payment_date_time) * 1000)
                 ] : null
             ];
 

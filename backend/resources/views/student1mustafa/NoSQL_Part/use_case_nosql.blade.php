@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.customer')
 
 @section('content')
     <h2>Mustafa – NoSQL Use Case: Unpaid Appointments</h2>
@@ -34,7 +34,7 @@
             <tbody>
                 @foreach($appointments as $appt)
                     <tr>
-                        <td>{{ \Carbon\Carbon::parse($appt->date_time)->format('Y-m-d H:i') }}</td>
+                        <td>{{ $appt->date_time->toDateTime()->format('Y-m-d H:i:s') }}</td>
                         <td>€{{ number_format($appt->total_price, 2) }}</td>
                         <td>{{ $appt->status }}</td>
                         <td>{{ $appt->payment->payment_status ?? 'Unpaid' }}</td>

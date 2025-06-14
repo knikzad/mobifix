@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.customer')
 
 @section('content')
     <h2>Mustafa – Pay Appointment (MongoDB)</h2>

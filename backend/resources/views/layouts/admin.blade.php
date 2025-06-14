@@ -52,64 +52,55 @@
         {{-- Sidebar --}}
         <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-white sidebar collapse border-end">
             <div class="position-sticky pt-3">
-                <h4 class="px-3 mb-3 text-primary fw-bold">
+                <h5 class="px-3 mb-3 text-primary fw-bold">
                     <a class="nav-link" href="{{ route('admin.home') }}">
                         Mobifix Admin Panel
                     </a>
-                </h4>
+                </h5>
                 <ul class="nav flex-column">
-
+                    <li class = "nav-title" style = "font-weight: bold;">SQL Part</li>
                     {{-- Employees --}}
-                    <li class="nav-item">
+                    <!-- <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.employees.*') ? 'active' : '' }}"
                            href="{{ route('admin.employees.index') }}">
                             Employees
                         </a>
-                    </li>
+                    </li> -->
 
                     {{-- Customers --}}
-                    <li class="nav-item">
+                    <!-- <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.customers.*') ? 'active' : '' }}"
                            href="{{ route('admin.customers.index') }}">
                             Customers
                         </a>
-                    </li>
+                    </li> -->
 
                     {{-- Repair Orders --}}
-                    <li class="nav-item">
+                    <!-- <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.repair-orders.*') ? 'active' : '' }}"
                            href="{{ route('admin.repair-orders.index') }}">
                             Repair Orders
                         </a>
-                    </li>
+                    </li> -->
 
                     {{-- Devices Section --}}
-                    <li class="nav-item">
+                    <!-- <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('device.types*') ? 'active' : '' }}"
                             href="{{ route('device.types.index') }}">
                             Device Types
                         </a>
-                    </li>
-
-                    {{-- Analytics --}}
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('use_case.analytics.report') ? 'active' : '' }}"
-                        href="{{ route('use_case.analytics.report') }}">
-                            Appointment Analytics Report (SQL)
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('nosql.use_case.analytics.report') ? 'active' : '' }}"
-                        href="{{ route('nosql.use_case.analytics.report') }}">
-                            Appointment Analytics Report (NoSQL)
-                        </a>
-                    </li>
-
-
+                    </li> -->
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('use_case.index') ? 'active' : '' }}"
                         href="{{ route('use_case.index') }}">
                             Appointment Use Case
+                        </a>
+                    </li>
+                    {{-- Analytics --}}
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('use_case.analytics.report') ? 'active' : '' }}"
+                        href="{{ route('use_case.analytics.report') }}">
+                            Appointment Analytics Report
                         </a>
                     </li>
 
@@ -136,17 +127,25 @@
                         </a>
                     </li>
 
+                    <li class = "nav-title" style = "font-weight: bold;">NoSQL Part</li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('nosql.use_case.analytics.report') ? 'active' : '' }}"
+                        href="{{ route('nosql.use_case.analytics.report') }}">
+                            Appointment Analytics Report
+                        </a>
+                    </li>
+
                     {{-- Mustafa NoSQL --}}
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('mustafa.nosql.use_case') ? 'active' : '' }}"
                         href="{{ route('mustafa.nosql.use_case') }}">
-                            Mustafa NoSQL Use Case
+                           Payment Use Case
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('mustafa.nosql.analytics') ? 'active' : '' }}"
                         href="{{ route('mustafa.nosql.analytics') }}">
-                            Mustafa NoSQL Analytics
+                            Payment Analytics Report
                         </a>
                     </li>
 

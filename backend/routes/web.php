@@ -78,7 +78,7 @@ Route::prefix('customer')->name('customer.')->group(function () {
 
     // Customer dashboard
     Route::get('/dashboard', function () {
-        return view('student2khalifa.customer.dashboard');
+        return view('student2khalifa.SQL.customer.dashboard');
     })->name('dashboard');
 
     // Appointment booking page (form wizard)
