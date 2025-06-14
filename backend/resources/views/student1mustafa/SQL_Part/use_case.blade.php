@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container mt-4">
-    <h2 class="mb-4">Mustafa Use Case: Payment per Appointment</h2>
+    <h2 class="mb-4">Payment per Appointment</h2>
 
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
@@ -28,12 +28,13 @@
 
     <!-- Appointments Table -->
     @if(!empty($appointments))
-        <h4 class="mt-5">Appointments for Selected Customer</h4>
+        <h4 class="mt-5">Your Appointments</h4>
         <table class="table table-bordered mt-3">
             <thead>
                 <tr>
+                    <th>#</th> {{-- Serial Number --}}
                     <th>Date/Time</th>
-                    <th>Status</th>
+                    <th>Appointment Status</th>
                     <th>Total Price (€)</th>
                     <th>Action</th>
                 </tr>
@@ -41,6 +42,7 @@
             <tbody>
                 @foreach($appointments as $appt)
                     <tr>
+                        <td>{{ $loop->iteration }}</td> {{-- This auto-generates 1, 2, 3... --}}
                         <td>{{ \Carbon\Carbon::parse($appt->date_time)->format('Y-m-d H:i') }}</td>
                         <td>{{ $appt->status }}</td>
                         <td>{{ number_format($appt->total_price, 2) }}</td>

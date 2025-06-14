@@ -13,11 +13,15 @@ class PaymentController extends Controller
 
     public function analyticsReport()
     {
+        // Detailed paid results
         $results = DB::select("
             SELECT 
                 u.first_name, 
-                u.last_name, 
-                c.preferred_contact_method, 
+                u.last_name,
+                u.city,
+                c.preferred_contact_method,
+                r.status AS appointment_status,
+                r.total_price,
                 p.payment_method, 
                 p.amount, 
                 p.payment_status
@@ -25,15 +29,45 @@ class PaymentController extends Controller
             JOIN customer c ON u.user_id = c.user_id
             JOIN repair_appointment r ON c.user_id = r.customer_id
             JOIN payment p ON r.appointment_id = p.appointment_id
-            WHERE r.status = 'completed' AND p.payment_status = 'paid'
+            WHERE r.status = 'completed'
             ORDER BY r.date_time DESC
         ");
 
+        // Paid by Card
+        $cardStats = DB::selectOne("
+            SELECT 
+                COUNT(*) AS total,
+                SUM(p.amount) AS total_collected
+            FROM repair_appointment r
+            JOIN payment p ON r.appointment_id = p.appointment_id
+            WHERE r.status = 'completed'
+            AND p.payment_status = 'paid'
+            AND p.payment_method = 'card'
+        ");
 
+        // Paid by Cash
+        $cashStats = DB::selectOne("
+            SELECT 
+                COUNT(*) AS total,
+                SUM(p.amount) AS total_collected
+            FROM repair_appointment r
+            JOIN payment p ON r.appointment_id = p.appointment_id
+            WHERE r.status = 'completed'
+            AND p.payment_status = 'paid'
+            AND p.payment_method = 'cash'
+        ");
 
-        return view('student1mustafa.SQL_Part.analytics_report', compact('results'));
+        // Unpaid
+        $unpaidStats = DB::selectOne("
+            SELECT COUNT(*) AS total
+            FROM repair_appointment r
+            LEFT JOIN payment p ON r.appointment_id = p.appointment_id
+            WHERE r.status = 'completed'
+            AND (p.payment_status IS NULL OR p.payment_status <> 'paid')
+        ");
+
+        return view('student1mustafa.SQL_Part.analytics_report', compact('results', 'cardStats', 'cashStats', 'unpaidStats'));
     }
-
 
 
     // Show dropdown and appointments for selected user
@@ -45,10 +79,7 @@ class PaymentController extends Controller
             ->join('repair_appointment AS ra', 'ra.customer_id', '=', 'customer.user_id')
             ->leftJoin('payment AS p', 'ra.appointment_id', '=', 'p.appointment_id')
             ->where('ra.status', 'completed') // Only completed appointments
-            ->where(function ($query) {
-                $query->whereNull('p.payment_status') // Include unpaid records (null)
-                    ->orWhere('p.payment_status', '<>', 'paid'); // Explicitly exclude paid
-            })
+            ->where('p.payment_status', 'unpaid')
             ->select('app_user.user_id', 'app_user.first_name', 'app_user.last_name')
             ->distinct() // Ensure unique customer records
             ->get();
@@ -61,7 +92,7 @@ class PaymentController extends Controller
         $appointments = DB::table('repair_appointment AS ra')
             ->leftJoin('payment AS p', 'ra.appointment_id', '=', 'p.appointment_id')
             ->where('ra.customer_id', $request->user_id)
-            ->Where('p.payment_status', '<>', 'paid')
+            ->Where('p.payment_status', 'unpaid')
             ->Where('ra.status', 'completed')
             ->get();
          }
@@ -90,13 +121,18 @@ public function processUserAppointmentPayment(Request $request)
         ->first();
 
     // Determine payment status based on method
-    $paymentStatus = ($request->payment_method === 'Cash') ? 'pending' : 'paid';
+    $paymentStatus = ($request->payment_method === 'cash') ? 'unpaid' : 'paid';
 
     if ($existingPayment) {
         // Update payment status if payment already exists
         DB::table('payment')
             ->where('appointment_id', $request->appointment_id)
-            ->update(['payment_status' => $paymentStatus,'amount' => $appointment->total_price, 'payment_date_time' => now()]);
+            ->update([
+                'payment_status'   => $paymentStatus,
+                'payment_method'   => $request->payment_method, // Ensure this updates correctly
+                'amount'           => $appointment->total_price,
+                'payment_date_time' => now()
+            ]);
     } else {
         // Create a new payment record if none exists
         DB::table('payment')->insert([
@@ -135,7 +171,11 @@ public function processUserAppointmentPayment(Request $request)
         $pendingPayments = DB::table('payment AS p')
             ->join('repair_appointment AS ra', 'p.appointment_id', '=', 'ra.appointment_id')
             ->join('app_user AS au', 'ra.customer_id', '=', 'au.user_id')
-            ->where('p.payment_status', 'pending') // Only Pending payments
+            ->where([
+                ['p.payment_status', '=', 'unpaid'],
+                ['p.payment_method', '=', 'cash']
+            ])
+            ->where('ra.status', 'completed')
             ->select('p.appointment_id', 'p.amount', 'p.payment_method', 'au.first_name', 'au.last_name')
             ->get();
 

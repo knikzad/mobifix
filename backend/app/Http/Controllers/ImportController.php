@@ -262,7 +262,7 @@ class ImportController extends Controller
                     'appointment_id' => $appt['appointment_id'],
                     'payment_number' => $pid,
                     'amount' => $faker->randomFloat(2, 10, 500),
-                    'payment_status' => $faker->randomElement(['paid', 'pending']),
+                    'payment_status' => $faker->randomElement(['paid', 'unpaid']),
                     'payment_method' => $faker->randomElement(['cash','card']),
                     'payment_date_time' => $faker->dateTimeBetween('-10 days','now'),
                 ];
