@@ -15,7 +15,7 @@
             <table class="table table-striped table-bordered text-center">
                 <thead class="table-dark">
                     <tr>
-                        <th>#</th> {{-- Serial Number --}}
+                        <th>#</th> 
                         <th>Customer Name</th>
                         <th>Amount (€)</th>
                         <th>Payment Method</th>
@@ -25,7 +25,7 @@
                 <tbody>
                     @foreach($pendingPayments as $payment)
                         <tr>
-                            <td>{{ $loop->iteration }}</td> {{-- This auto-generates 1, 2, 3... --}}
+                            <td>{{ $loop->iteration }}</td> 
                             <td>{{ $payment->first_name }} {{ $payment->last_name }}</td>
                             <td><strong>€{{ number_format($payment->amount, 2) }}</strong></td>
                             <td>{{ $payment->payment_method }}</td>

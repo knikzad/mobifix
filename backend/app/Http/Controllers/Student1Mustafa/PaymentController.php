@@ -13,7 +13,6 @@ class PaymentController extends Controller
 
     public function analyticsReport()
     {
-        // Detailed paid results
         $results = DB::select("
             SELECT 
                 u.first_name, 
@@ -33,7 +32,6 @@ class PaymentController extends Controller
             ORDER BY r.date_time DESC
         ");
 
-        // Paid by Card
         $cardStats = DB::selectOne("
             SELECT 
                 COUNT(*) AS total,
@@ -45,7 +43,6 @@ class PaymentController extends Controller
             AND p.payment_method = 'card'
         ");
 
-        // Paid by Cash
         $cashStats = DB::selectOne("
             SELECT 
                 COUNT(*) AS total,
@@ -57,7 +54,6 @@ class PaymentController extends Controller
             AND p.payment_method = 'cash'
         ");
 
-        // Unpaid
         $unpaidStats = DB::selectOne("
             SELECT COUNT(*) AS total
             FROM repair_appointment r
@@ -70,18 +66,16 @@ class PaymentController extends Controller
     }
 
 
-    // Show dropdown and appointments for selected user
     public function useCasePage(Request $request)
     {
-        // Load customers
         $customers = DB::table('app_user')
             ->join('customer', 'app_user.user_id', '=', 'customer.user_id')
             ->join('repair_appointment AS ra', 'ra.customer_id', '=', 'customer.user_id')
             ->leftJoin('payment AS p', 'ra.appointment_id', '=', 'p.appointment_id')
-            ->where('ra.status', 'completed') // Only completed appointments
+            ->where('ra.status', 'completed') 
             ->where('p.payment_status', 'unpaid')
             ->select('app_user.user_id', 'app_user.first_name', 'app_user.last_name')
-            ->distinct() // Ensure unique customer records
+            ->distinct() 
             ->get();
 
 
@@ -115,29 +109,25 @@ public function processUserAppointmentPayment(Request $request)
         ->where('appointment_id', $request->appointment_id)
         ->first();
 
-    // Check if a payment already exists
     $existingPayment = DB::table('payment')
         ->where('appointment_id', $request->appointment_id)
         ->first();
 
-    // Determine payment status based on method
     $paymentStatus = ($request->payment_method === 'cash') ? 'unpaid' : 'paid';
 
     if ($existingPayment) {
-        // Update payment status if payment already exists
         DB::table('payment')
             ->where('appointment_id', $request->appointment_id)
             ->update([
                 'payment_status'   => $paymentStatus,
-                'payment_method'   => $request->payment_method, // Ensure this updates correctly
+                'payment_method'   => $request->payment_method,
                 'amount'           => $appointment->total_price,
                 'payment_date_time' => now()
             ]);
     } else {
-        // Create a new payment record if none exists
         DB::table('payment')->insert([
             'appointment_id'     => $appointment->appointment_id,
-            'payment_number'     => 1, // First payment entry
+            'payment_number'     => 1, 
             'amount'             => $appointment->total_price,
             'payment_status'     => $paymentStatus,
             'payment_method'     => $request->payment_method,
@@ -164,10 +154,9 @@ public function processUserAppointmentPayment(Request $request)
     }
 
 
-    // ++++++++++++++++++++++++++++++++++++++++++
+    // ++++++++++++++++++++++++++++++++++++++++++ this part is implemented for the project logic not required for this
     public function pendingPaymentsPage()
     {
-        // Fetch all unpaid (Pending) payments
         $pendingPayments = DB::table('payment AS p')
             ->join('repair_appointment AS ra', 'p.appointment_id', '=', 'ra.appointment_id')
             ->join('app_user AS au', 'ra.customer_id', '=', 'au.user_id')

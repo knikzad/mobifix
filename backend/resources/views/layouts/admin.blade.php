@@ -123,7 +123,7 @@
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('mustafa.pendingPayments') ? 'active' : '' }}"
                         href="{{ route('mustafa.pendingPayments') }}">
-                            Pending Payments
+                            Cash Confirmation
                         </a>
                     </li>
 
@@ -153,6 +153,13 @@
                         <a class="nav-link {{ request()->routeIs('mustafa.nosql.analytics') ? 'active' : '' }}"
                         href="{{ route('mustafa.nosql.analytics') }}">
                             Payment Analytics Report
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('mustafa.nosql.pendingPayments') ? 'active' : '' }}"
+                        href="{{ route('mustafa.nosql.pendingPayments') }}">
+                            Cash Confirmation
                         </a>
                     </li>
 

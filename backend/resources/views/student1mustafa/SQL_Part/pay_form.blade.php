@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container mt-4">
-    <h2>Pay for Appointment</h2>
+    <h2>Pay for Your Appointment</h2>
 
     <form method="POST" action="{{ route('mustafa.use_case.pay') }}">
         @csrf
@@ -55,7 +55,7 @@
         const paymentMethod = document.getElementById('payment_method').value;
         const cardFields = document.getElementById('cardFields');
 
-        if (paymentMethod === 'Credit Card') {
+        if (paymentMethod === 'card') {
             cardFields.classList.remove('d-none');
         } else {
             cardFields.classList.add('d-none');

@@ -96,18 +96,10 @@ Route::prefix('customer')->name('customer.')->group(function () {
 // Student 1 Mustafa Specific Part
 
 Route::get('/mustafa/analytics-report', [PaymentController::class, 'analyticsReport'])->name('mustafa.analytics.report');
-
 Route::get('/mustafa/use-case', [PaymentController::class, 'useCasePage'])->name('mustafa.use_case.page');
 Route::post('/mustafa/use-case/pay', [PaymentController::class, 'processUserAppointmentPayment'])->name('mustafa.use_case.pay');
-
-
-// Show payment form
 Route::get('/mustafa/use-case/pay/{appointment_id}', [PaymentController::class, 'showPaymentForm'])->name('mustafa.use_case.pay_form');
-
-// Process payment form submission
 Route::post('/mustafa/use-case/pay', [PaymentController::class, 'processUserAppointmentPayment'])->name('mustafa.use_case.pay');
-
-
 Route::get('/mustafa/pending-payments', [PaymentController::class, 'pendingPaymentsPage'])->name('mustafa.pendingPayments');
 Route::post('/mustafa/confirm-payment', [PaymentController::class, 'confirmPayment'])->name('mustafa.confirmPayment');
 
@@ -116,10 +108,10 @@ Route::post('/mustafa/confirm-payment', [PaymentController::class, 'confirmPayme
 Route::get('/mustafa-nosql/analytics', [MustafaNoSQLController::class, 'analyticsReport'])->name('mustafa.nosql.analytics');
 Route::get('/mustafa-nosql/use-case', [MustafaNoSQLController::class, 'useCasePage'])->name('mustafa.nosql.use_case');
 Route::post('/mustafa-nosql/use-case/pay', [MustafaNoSQLController::class, 'processPayment'])->name('mustafa.nosql.use_case.pay');
-
-Route::get('/mustafa-nosql/use-case', [MustafaNoSQLController::class, 'useCasePage'])->name('mustafa.nosql.use_case');
 Route::get('/mustafa-nosql/pay/{appointment_id}', [MustafaNoSQLController::class, 'showPaymentForm'])->name('mustafa.nosql.pay.form');
 Route::post('/mustafa-nosql/pay', [MustafaNoSQLController::class, 'processPayment'])->name('mustafa.nosql.pay.submit');
+Route::get('/mustafa/nosql/pending-payments', [MustafaNoSQLController::class, 'pendingPaymentsPage'])->name('mustafa.nosql.pendingPayments');
+Route::post('/mustafa/nosql/confirm-payment', [MustafaNoSQLController::class, 'confirmPayment'])->name('mustafa.nosql.confirm_payment');
 
 
 //====================================================noSQL routes
