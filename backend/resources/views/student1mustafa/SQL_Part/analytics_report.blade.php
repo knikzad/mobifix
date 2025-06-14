@@ -71,7 +71,7 @@
                             <td>{{ $row->payment_method }}</td>
                             <td><strong>€{{ number_format($row->amount, 2) }}</strong></td>
                             <td>
-                                <span class="badge {{ $row->payment_status == 'Paid' ? 'bg-success' : 'bg-warning' }}">
+                                <span class="badge {{ $row->payment_status == 'paid' ? 'bg-success' : 'bg-warning' }}">
                                     {{ ucfirst($row->payment_status) }}
                                 </span>
                             </td>

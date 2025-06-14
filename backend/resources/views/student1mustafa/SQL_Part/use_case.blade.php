@@ -36,18 +36,20 @@
                     <th>Date/Time</th>
                     <th>Appointment Status</th>
                     <th>Total Price (€)</th>
+                    <th>Payment Status</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($appointments as $appt)
                     <tr>
-                        <td>{{ $loop->iteration }}</td> {{-- This auto-generates 1, 2, 3... --}}
+                        <td>{{ $loop->iteration }}</td>
                         <td>{{ \Carbon\Carbon::parse($appt->date_time)->format('Y-m-d H:i') }}</td>
                         <td>{{ $appt->status }}</td>
                         <td>{{ number_format($appt->total_price, 2) }}</td>
+                        <td>{{ $appt->payment->payment_status ?? 'Unpaid' }}</td>
                         <td>
-                            <a href="{{ route('mustafa.use_case.pay_form', $appt->appointment_id) }}" class="btn btn-success btn-sm">
+                            <a href="{{ route('mustafa.use_case.pay_form', $appt->appointment_id) }}" class="btn btn-sm btn-primary">
                                 Pay
                             </a>
 
