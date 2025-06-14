@@ -14,7 +14,7 @@
         </div>
 
         <div class="mb-3">
-            <label>Total Price (€)</label>
+            <label>Total Amount To Pay (€)</label>
             <input type="text" class="form-control" value="{{ number_format($appointment->total_price, 2) }}" disabled>
         </div>
 
@@ -22,8 +22,8 @@
             <label for="payment_method">Payment Method</label>
             <select name="payment_method" id="payment_method" class="form-select" required onchange="toggleCardFields()"> 
             <option value="">Select method</option>
-            <option value="Credit Card">Credit Card</option>
-                <option value="Cash">Cash</option>
+            <option value="card">Credit Card</option>
+                <option value="cash">Cash</option>
             </select>
         </div>
 
