@@ -148,52 +148,63 @@ class MongoMigrationController extends Controller
         }
     }
 
-    protected function migrateAppointments()
-    {
-        $appointments = DB::table('repair_appointment')->get();
+protected function migrateAppointments()
+{
+    // Step 1: Migrate all service methods to MongoDB (only once)
+    $existingMethods = $this->mongo->service_method->distinct('method_id');
+    $sqlServiceMethods = DB::table('service_method')->get();
 
-        foreach ($appointments as $appt) {
-            $method = DB::table('service_method')->where('method_id', $appt->method_id)->first();
-            $payment = DB::table('payment')
-                ->where('appointment_id', $appt->appointment_id)
-                ->orderByDesc('payment_number')->first();
-
-            $doc = [
-                '_id' => $appt->appointment_id,
-                'date_time' => new UTCDateTime(strtotime($appt->date_time) * 1000),
-                'status' => $appt->status,
-                'total_price' => (float) $appt->total_price,
-                'customer_id' => $appt->customer_id,
-                'employee_id' => $appt->employee_id,
-                'service_method' => $method ? [
-                    'method_id' => $method->method_id,
-                    'method_name' => $method->method_name,
-                    'estimated_time' => (int) $method->estimated_time,
-                    'cost' => (float) $method->cost,
-                    'note' => $method->note
-                ] : null,
-                'payment' => $payment ? [
-                    'payment_number' => $payment->payment_number,
-                    'amount' => (float) $payment->amount,
-                    'payment_method' => $payment->payment_method,
-                    'payment_status' => $payment->payment_status,
-                    'payment_date_time' => new UTCDateTime(strtotime($payment->payment_date_time) * 1000)
-                ] : null
-            ];
-
-            $this->mongo->appointments->insertOne($doc);
-
-            // Services (Intermediate)
-            $services = DB::table('repair_service_appointment')
-                ->where('appointment_id', $appt->appointment_id)
-                ->get();
-
-            foreach ($services as $s) {
-                $this->mongo->repair_service_appointment->insertOne([
-                    'appointment_id' => $s->appointment_id,
-                    'service_id' => $s->service_id
-                ]);
-            }
+    foreach ($sqlServiceMethods as $method) {
+        if (!in_array($method->method_id, $existingMethods)) {
+            $this->mongo->service_method->insertOne([
+                'method_id' => $method->method_id,
+                'method_name' => $method->method_name,
+                'estimated_time' => (int) $method->estimated_time,
+                'cost' => (float) $method->cost,
+                'note' => $method->note
+            ]);
         }
     }
+
+    // Step 2: Migrate appointments with method_id reference
+    $appointments = DB::table('repair_appointment')->get();
+
+    foreach ($appointments as $appt) {
+        $payment = DB::table('payment')
+            ->where('appointment_id', $appt->appointment_id)
+            ->orderByDesc('payment_number')->first();
+
+        $doc = [
+            '_id' => $appt->appointment_id,
+            'date_time' => new UTCDateTime(strtotime($appt->date_time) * 1000),
+            'status' => $appt->status,
+            'total_price' => (float) $appt->total_price,
+            'customer_id' => $appt->customer_id,
+            'employee_id' => $appt->employee_id,
+            'method_id' => $appt->method_id, // Reference to MongoDB's service_method
+            'payment' => $payment ? [
+                'payment_number' => $payment->payment_number,
+                'amount' => (float) $payment->amount,
+                'payment_method' => $payment->payment_method,
+                'payment_status' => $payment->payment_status,
+                'payment_date_time' => new UTCDateTime(strtotime($payment->payment_date_time) * 1000)
+            ] : null
+        ];
+
+        $this->mongo->appointments->insertOne($doc);
+
+        // Services (Intermediate)
+        $services = DB::table('repair_service_appointment')
+            ->where('appointment_id', $appt->appointment_id)
+            ->get();
+
+        foreach ($services as $s) {
+            $this->mongo->repair_service_appointment->insertOne([
+                'appointment_id' => $s->appointment_id,
+                'service_id' => $s->service_id
+            ]);
+        }
+    }
+}
+
 }

@@ -129,6 +129,13 @@
 
                     <li class = "nav-title" style = "font-weight: bold;">NoSQL Part</li>
                     <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('use_case.index') ? 'active' : '' }}"
+                        href="{{ route('nosql.use_case.index') }}">
+                            Appointment Use Case
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('nosql.use_case.analytics.report') ? 'active' : '' }}"
                         href="{{ route('nosql.use_case.analytics.report') }}">
                             Appointment Analytics Report

@@ -204,7 +204,4 @@ class UseCaseController extends Controller
         return view('student2khalifa.SQL.admin.analytics_report', ['stats' => $report]);
     }
 
-
-
-
 }

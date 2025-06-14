@@ -70,32 +70,27 @@ Route::prefix('nosql/use-case')->name('nosql.use_case.')->group(function () {
     Route::post('/select_user', [NoSqlUseCaseController::class, 'selectUser'])->name('selectUser');
     Route::get('/analytics_report', [NoSqlUseCaseController::class, 'analyticsReport'])->name('analytics.report');
     Route::get('/appointment/create', [NoSqlUseCaseController::class, 'createAppointment'])->name('appointment.create');
+    Route::post('/appointment/store', [SqlUseCaseController::class, 'storeAppointment'])->name('appointment.store');
+
 });
 
 
-// Customer related routes
+// Customer related routes sql part
 Route::prefix('customer')->name('customer.')->group(function () {
-
     // Customer dashboard
     Route::get('/dashboard', function () {
         return view('student2khalifa.SQL.customer.dashboard');
     })->name('dashboard');
-
     // Appointment booking page (form wizard)
     Route::get('/appointment/create', [SqlUseCaseController::class, 'createAppointment'])->name('appointment.create');
-
     // store the created appointment
     Route::post('/appointment/store', [SqlUseCaseController::class, 'storeAppointment'])->name('appointment.store');
-
-
     // Customer's appointments list
     Route::get('/appointments', [SqlUseCaseController::class, 'listAppointments'])->name('appointments');
-
     // Customer profile
     Route::get('/profile', [SqlUseCaseController::class, 'customerProfile'])->name('profile');
 
 });
-
 
 // =======================================================
 // Student 1 Mustafa Specific Part
