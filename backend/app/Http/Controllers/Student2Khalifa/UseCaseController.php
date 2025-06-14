@@ -14,12 +14,9 @@ class UseCaseController extends Controller
     public function index()
     {
         $users = DB::select("
-            SELECT au.user_id, au.first_name, au.last_name, 
-                au.user_type, e.role 
-            FROM app_user au 
-            LEFT JOIN employee e ON au.user_id = e.user_id 
-            WHERE au.status = 'active' 
-            ORDER BY au.user_type = 'employee' DESC, au.first_name ASC
+            SELECT user_id, user_type, first_name, last_name
+            FROM app_user 
+            WHERE user_type = 'customer'
         ");
 
         return view('student2khalifa.SQL.admin.user_selection', ['users' => $users]);
@@ -27,45 +24,22 @@ class UseCaseController extends Controller
 
     public function selectUser(Request $request)
     {
-        $request->validate([
-            'user_id' => 'required|exists:app_user,user_id',
-        ]);
 
-        // Retrieve user details
-        $user = DB::selectOne("
-            SELECT au.user_id, au.first_name, au.last_name, 
-                au.user_type, e.role 
-            FROM app_user au 
-            LEFT JOIN employee e ON au.user_id = e.user_id 
-            WHERE au.user_id = ?
-        ", [$request->user_id]);
-
-        // Store user in session
+        // Store user_id in session
         session([
             'selected_user' => [
-                'user_id' => $user->user_id,
-                'first_name' => $user->first_name,
-                'last_name' => $user->last_name,
-                'user_type' => $user->user_type,
-                'role' => $user->role ?? null,
+                'user_id' => $request->user_id,
             ]
         ]);
 
-        // Redirect based on user type
-        if ($user->user_type === 'employee') {
-            return redirect()->route('admin.repair-orders.index'); // Redirect employees to repair orders
-        } else {
-            return redirect()->route('use_case.appointment.create'); // Redirect customers to the appointment booking page
-        }
+        // Redirect toward usecase
+        return redirect()->route('use_case.appointment.create');
     }
     // list the repair service, service method, and user info for creating appointment
     public function createAppointment()
     {
         // Ensure only customers access this page
         $selectedUser = session('selected_user');
-        if (!$selectedUser || $selectedUser['user_type'] !== 'customer') {
-            return redirect()->route('use_case.index')->withErrors('Only customers can book appointments.');
-        }
 
         // Fetch available repair services, including price and time taken
         $repairServices = DB::select("
@@ -98,14 +72,12 @@ class UseCaseController extends Controller
     }
 
 
-
-
     public function storeAppointment(Request $request)
     {
         // Validate the incoming request
         $request->validate([
             'service_ids' => 'required|array',
-            'method_id' => 'required|exists:service_method,method_id',
+            'method_id' => 'required|string',
             'appointment_date' => 'required|date',
             'time_slot' => 'required|string',
             'email' => 'required|email',
@@ -137,7 +109,7 @@ class UseCaseController extends Controller
 
         DB::insert("
             INSERT INTO repair_appointment (appointment_id, customer_id, method_id, date_time, status, total_price)
-            VALUES (?, ?, ?, ?, 'Pending', ?)
+            VALUES (?, ?, ?, ?, 'booked', ?)
         ", [$appointmentId, $customerId, $request->method_id, $formattedDateTime, $request->total_price]);
 
 
@@ -157,9 +129,6 @@ class UseCaseController extends Controller
     {
         // Ensure only customers access this page
         $selectedUser = session('selected_user');
-        if (!$selectedUser || $selectedUser['user_type'] !== 'customer') {
-            return redirect()->route('use_case.index')->withErrors('Only customers can view appointments.');
-        }
 
         // Fetch all appointments for the selected customer
         $appointments = DB::select("

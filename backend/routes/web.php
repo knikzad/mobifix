@@ -70,8 +70,8 @@ Route::prefix('nosql/use-case')->name('nosql.use_case.')->group(function () {
     Route::post('/select_user', [NoSqlUseCaseController::class, 'selectUser'])->name('selectUser');
     Route::get('/analytics_report', [NoSqlUseCaseController::class, 'analyticsReport'])->name('analytics.report');
     Route::get('/appointment/create', [NoSqlUseCaseController::class, 'createAppointment'])->name('appointment.create');
-    Route::post('/appointment/store', [SqlUseCaseController::class, 'storeAppointment'])->name('appointment.store');
-
+    Route::post('/appointment/store', [NoSqlUseCaseController::class, 'storeAppointment'])->name('appointment.store');
+    Route::get('/appointments', [NoSqlUseCaseController::class, 'listAppointments'])->name('appointments');
 });
 
 

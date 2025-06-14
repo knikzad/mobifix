@@ -32,7 +32,7 @@ class MongoMigrationController extends Controller
     protected function clearAll()
     {
         foreach ([
-            'users', 'appointments', 'repair_service',
+            'users', 'appointments', 'repair_service', 'service_method',
             'repair_service_appointment', 'device_model',
             'brand', 'device_type', 'device_type_brand'
         ] as $collection) {
@@ -150,20 +150,18 @@ class MongoMigrationController extends Controller
 
 protected function migrateAppointments()
 {
-    // Step 1: Migrate all service methods to MongoDB (only once)
+    // Step 1: Migrate all service methods to MongoDB
     $existingMethods = $this->mongo->service_method->distinct('method_id');
     $sqlServiceMethods = DB::table('service_method')->get();
 
     foreach ($sqlServiceMethods as $method) {
-        if (!in_array($method->method_id, $existingMethods)) {
-            $this->mongo->service_method->insertOne([
-                'method_id' => $method->method_id,
-                'method_name' => $method->method_name,
-                'estimated_time' => (int) $method->estimated_time,
-                'cost' => (float) $method->cost,
-                'note' => $method->note
-            ]);
-        }
+        $this->mongo->service_method->insertOne([
+            '_id' => $method->method_id,
+            'method_name' => $method->method_name,
+            'estimated_time' => (int) $method->estimated_time,
+            'cost' => (float) $method->cost,
+            'note' => $method->note
+        ]);
     }
 
     // Step 2: Migrate appointments with method_id reference
