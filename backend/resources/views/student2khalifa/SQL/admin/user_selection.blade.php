@@ -18,8 +18,7 @@
                     <option >...</option>
                 @foreach ($users as $user)
                     <option value="{{ $user->user_id }}">
-                        {{ $user->first_name }} {{ $user->last_name }} 
-                        ({{ $user->user_type }}{{ $user->role ? ' - ' . $user->role : '' }})
+                        {{ $user->first_name }} {{ $user->last_name }}
                     </option>
                 @endforeach
             </select>

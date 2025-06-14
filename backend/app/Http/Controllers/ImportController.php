@@ -245,7 +245,7 @@ class ImportController extends Controller
                         'employee_id' => $faker->randomElement($employeeIds),
                         'method_id' => $faker->randomElement($methodIds),
                         'date_time' => $faker->dateTimeBetween('-30 days', '+30 days'),
-                        'status' => $faker->randomElement(['pending', 'completed', 'cancelled']),
+                        'status' => $faker->randomElement(['booked', 'confirmed', 'in-progress', 'completed', 'cancelled']),
                         'total_price' => $faker->randomFloat(2, 20, 500),
                     ];
                 }
