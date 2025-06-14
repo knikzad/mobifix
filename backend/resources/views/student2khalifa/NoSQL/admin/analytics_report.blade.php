@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container mt-5">
-    <h2 class="mb-4 text-center">Repair Appointment Analytics: Service Method, Customer & Estimated Revenue Insights (Last 30 Days)</h2>
+    <h4 class="mb-4 text-center">Repair Appointment Analytics: Service Method, Customer & Estimated Revenue Insights (Last 30 Days)(NoSQL)</h4>
 
     @if(count($stats) > 0)
     <div class="table-responsive">

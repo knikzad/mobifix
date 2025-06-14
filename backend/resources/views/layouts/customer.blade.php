@@ -90,6 +90,13 @@
                         </a>
                     </li>
                     <li class = "nav-title" style = "font-weight: bold;">NoSQL Part</li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('nosql.use_case.index') ? 'active' : '' }}"
+                        href="{{ route('nosql.use_case.index') }}">
+                            Appointment Use Case
+                        </a>
+                    </li>
+
                     {{-- Mustafa NoSQL --}}
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('mustafa.nosql.use_case') ? 'active' : '' }}"

@@ -105,6 +105,9 @@ class UseCaseController extends Controller
             'house_number' => 'nullable|string',
             'city' => 'nullable|string',
             'postal_code' => 'nullable|string'
+        ], [
+            'service_ids.required' => 'The Service field is required.',
+            'method_id.required' => 'The Service Method field is required.'
         ]);
 
         $customerId = session('selected_user')['user_id'];

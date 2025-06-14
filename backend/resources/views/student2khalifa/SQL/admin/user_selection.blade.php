@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="container mt-4">
-    <h2 class="mb-4">Select a User</h2>
+    <h2 class="mb-4">Select a User (SQL)</h2>
 
     <div class="mb-3">
         <p>Please select a user to proceed:</p>

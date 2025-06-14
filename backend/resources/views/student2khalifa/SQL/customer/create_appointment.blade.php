@@ -4,7 +4,16 @@
 
 @section('content')
 <div class="container mt-4">
-    <h2 class="mb-4">Book a Repair Appointment</h2>
+    <h2 class="mb-4">Book a Repair Appointment (SQL)</h2>
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
     <form action="{{ route('customer.appointment.store') }}" method="POST">
         @csrf
