@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   mobifix-backend:
     build:
@@ -7,23 +5,22 @@ services:
       dockerfile: Dockerfile
     container_name: mobifix-backend
     restart: unless-stopped
-    working_dir: /var/www/html
+    working_dir: /var/www
     volumes:
-      - ./backend:/var/www/html:cached
+      - ./backend:/var/www:cached
     depends_on:
       - mobifix-db
       - mobifix-mongo
     networks:
       - mobifix-net
-
-    # ✅ Added this line to run migrations automatically and start PHP
     command: >
       sh -c "
+        while ! nc -z mobifix-db 3306; do sleep 3; done &&
+        while ! nc -z mobifix-mongo 27017; do sleep 3; done &&
         composer install &&
         php artisan migrate --force &&
         php-fpm
       "
-
   mobifix-db:
     image: mariadb:10.7
     container_name: mobifix-db
@@ -37,6 +34,13 @@ services:
       - db-data:/var/lib/mysql
     networks:
       - mobifix-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "mobifixuser", "-pmobifixpass"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
 
   mobifix-nginx:
     image: nginx:alpine
@@ -46,7 +50,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./backend:/var/www/html
+      - ./backend:/var/www
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
       - ./nginx/ssl:/etc/nginx/ssl
     depends_on:
@@ -64,7 +68,12 @@ services:
       - mongo-data:/data/db
     networks:
       - mobifix-net
-
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.runCommand({ ping: 1 })"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      
 volumes:
   db-data:
   mongo-data:

@@ -36,7 +36,6 @@ class UseCaseController extends Controller
                 ]
             ]
         ];
-
         // Execute aggregation query
         $users = $this->mongo->users->aggregate($pipeline)->toArray();
 
@@ -234,7 +233,6 @@ class UseCaseController extends Controller
                 '$sort' => ['date_time' => -1]
             ]
         ];
-
         $appointments = $this->mongo->appointments->aggregate($pipeline)->toArray();
         return view('student2khalifa.NoSQL.customer.appointments', ['appointments' => $appointments]);
     }
@@ -283,7 +281,6 @@ class UseCaseController extends Controller
                 '$sort' => ['total_revenue' => -1]
             ]
         ];
-
         $report = $this->mongo->appointments->aggregate($pipeline)->toArray();
 
         return view('student2khalifa.NoSQL.admin.analytics_report', ['stats' => $report]);

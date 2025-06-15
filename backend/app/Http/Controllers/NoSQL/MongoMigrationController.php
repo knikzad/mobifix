@@ -24,7 +24,9 @@ class MongoMigrationController extends Controller
         $this->migrateDeviceData();
         $this->migrateRepairServices();
         $this->migrateAppointments();
-
+        
+        $this->ensureAppointmentIndexes();
+        
         return redirect()->route('admin.home')->with('success', 'Full migration to MongoDB completed successfully.');
     }
 
@@ -156,57 +158,75 @@ class MongoMigrationController extends Controller
         }
     }
 
-protected function migrateAppointments()
-{
-    // Step 1: Migrate all service methods
-    $sqlServiceMethods = DB::table('service_method')->get();
+    protected function migrateAppointments()
+    {
+        // Step 1: Migrate all service methods
+        $sqlServiceMethods = DB::table('service_method')->get();
 
-    foreach ($sqlServiceMethods as $method) {
-        $this->mongo->service_method->insertOne([
-            '_id' => $method->method_id,
-            'method_name' => $method->method_name,
-            'estimated_time' => (int) $method->estimated_time,
-            'cost' => (float) $method->cost,
-            'note' => $method->note
-        ]);
+        foreach ($sqlServiceMethods as $method) {
+            $this->mongo->service_method->insertOne([
+                '_id' => $method->method_id,
+                'method_name' => $method->method_name,
+                'estimated_time' => (int) $method->estimated_time,
+                'cost' => (float) $method->cost,
+                'note' => $method->note
+            ]);
+        }
+
+        // Step 2: Migrate appointments with embedded service_ids
+        $appointments = DB::table('repair_appointment')->get();
+
+        foreach ($appointments as $appt) {
+            $payment = DB::table('payment')
+                ->where('appointment_id', $appt->appointment_id)
+                ->orderByDesc('payment_number')
+                ->first();
+
+            // Fetch related service IDs (many-to-many)
+            $serviceIds = DB::table('repair_service_appointment')
+                ->where('appointment_id', $appt->appointment_id)
+                ->pluck('service_id')
+                ->toArray();
+
+            $doc = [
+                '_id' => $appt->appointment_id,
+                'date_time' => new UTCDateTime(strtotime($appt->date_time) * 1000),
+                'status' => $appt->status,
+                'total_price' => (float) $appt->total_price,
+                'customer_id' => $appt->customer_id,
+                'employee_id' => $appt->employee_id,
+                'method_id' => $appt->method_id, // Reference to service_method
+                'service_ids' => $serviceIds,     // Embed service references
+                'payment' => $payment ? [
+                    'payment_number' => $payment->payment_number,
+                    'amount' => (float) $payment->amount,
+                    'payment_method' => $payment->payment_method,
+                    'payment_status' => $payment->payment_status,
+                    'payment_date_time' => new UTCDateTime(strtotime($payment->payment_date_time) * 1000)
+                ] : null
+            ];
+
+            $this->mongo->appointments->insertOne($doc);
+        }
     }
 
-    // Step 2: Migrate appointments with embedded service_ids
-    $appointments = DB::table('repair_appointment')->get();
+    protected function ensureAppointmentIndexes()
+    {
+        // Index for faster analytics filtering by date_time
+        $this->mongo->appointments->createIndex(['date_time' => 1]);
+        // Indexes for faster filtering or joining on customer_id and employee_id
+        $this->mongo->appointments->createIndex(['customer_id' => 1]);
+        $this->mongo->appointments->createIndex(['employee_id' => 1]);
+        // Optional: Index for faster lookup by service method (if queried often)
+        $this->mongo->appointments->createIndex(['method_id' => 1]);
+        // New index for filtering by status
+        $this->mongo->appointments->createIndex(['status' => 1]);
+        // New compound index for payment status and method
+        $this->mongo->appointments->createIndex(['payment.payment_status' => 1, 'payment.payment_method' => 1]);
 
-    foreach ($appointments as $appt) {
-        $payment = DB::table('payment')
-            ->where('appointment_id', $appt->appointment_id)
-            ->orderByDesc('payment_number')
-            ->first();
-
-        // Fetch related service IDs (many-to-many)
-        $serviceIds = DB::table('repair_service_appointment')
-            ->where('appointment_id', $appt->appointment_id)
-            ->pluck('service_id')
-            ->toArray();
-
-        $doc = [
-            '_id' => $appt->appointment_id,
-            'date_time' => new UTCDateTime(strtotime($appt->date_time) * 1000),
-            'status' => $appt->status,
-            'total_price' => (float) $appt->total_price,
-            'customer_id' => $appt->customer_id,
-            'employee_id' => $appt->employee_id,
-            'method_id' => $appt->method_id, // Reference to service_method
-            'service_ids' => $serviceIds,     // Embed service references
-            'payment' => $payment ? [
-                'payment_number' => $payment->payment_number,
-                'amount' => (float) $payment->amount,
-                'payment_method' => $payment->payment_method,
-                'payment_status' => $payment->payment_status,
-                'payment_date_time' => new UTCDateTime(strtotime($payment->payment_date_time) * 1000)
-            ] : null
-        ];
-
-        $this->mongo->appointments->insertOne($doc);
+        $this->mongo->users->createIndex(['user_type' => 1]);
     }
-}
+
 
 
 }
