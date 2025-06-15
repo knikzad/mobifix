@@ -91,7 +91,6 @@ class UseCaseController extends Controller
         ]);
     }
 
-
     public function storeAppointment(Request $request)
     {
         $request->validate([
@@ -116,7 +115,7 @@ class UseCaseController extends Controller
         $serviceMethod = $this->mongo->service_method->findOne(['_id' => $request->method_id]);
         $serviceMethodCost = $serviceMethod ? (float) $serviceMethod['cost'] : 0;
 
-        // Fetch repair service prices
+        // Calculate total price from selected services
         $totalServiceCost = 0;
         foreach ($request->service_ids as $serviceId) {
             $service = $this->mongo->repair_service->findOne(['_id' => $serviceId]);
@@ -125,7 +124,6 @@ class UseCaseController extends Controller
             }
         }
 
-        // Calculate total price
         $totalPrice = $totalServiceCost + $serviceMethodCost;
 
         // Update customer contact info
@@ -145,36 +143,27 @@ class UseCaseController extends Controller
 
         $dateTime = Carbon::parse($request->appointment_date . ' ' . $request->time_slot);
 
+        // Store appointment document with embedded service_ids
         $appointmentDoc = [
             'customer_id' => $customerId,
             'method_id' => $request->method_id,
+            'service_ids' => $request->service_ids, // Embed array of IDs
             'date_time' => new UTCDateTime($dateTime->getTimestamp() * 1000),
             'status' => 'booked',
             'total_price' => $totalPrice,
         ];
 
-        $insertedAppointment = $this->mongo->appointments->insertOne($appointmentDoc);
-        $appointmentId = $insertedAppointment->getInsertedId();
-
-        // Insert linked repair services
-        $serviceAppointmentDocs = [];
-        foreach ($request->service_ids as $serviceId) {
-            $serviceAppointmentDocs[] = [
-                'appointment_id' => $appointmentId,
-                'service_id' => $serviceId,
-            ];
-        }
-        if (!empty($serviceAppointmentDocs)) {
-            $this->mongo->repair_service_appointment->insertMany($serviceAppointmentDocs);
-        }
+        $this->mongo->appointments->insertOne($appointmentDoc);
 
         return redirect()->route('nosql.use_case.appointments')->with('success', 'Appointment booked successfully!');
     }
 
 
+
     public function listAppointments()
     {
         $selectedUser = session('selected_user');
+
         $pipeline = [
             [
                 '$match' => ['customer_id' => $selectedUser['user_id']]
@@ -195,40 +184,10 @@ class UseCaseController extends Controller
             ],
             [
                 '$lookup' => [
-                    'from' => 'repair_service_appointment',
-                    'localField' => '_id',
-                    'foreignField' => 'appointment_id',
-                    'as' => 'service_links'
-                ]
-            ],
-            [
-                '$unwind' => [
-                    'path' => '$service_links',
-                    'preserveNullAndEmptyArrays' => true
-                ]
-            ],
-            [
-                '$lookup' => [
                     'from' => 'repair_service',
-                    'localField' => 'service_links.service_id',
+                    'localField' => 'service_ids',
                     'foreignField' => '_id',
                     'as' => 'service_info'
-                ]
-            ],
-            [
-                '$unwind' => [
-                    'path' => '$service_info',
-                    'preserveNullAndEmptyArrays' => true
-                ]
-            ],
-            [
-                '$group' => [
-                    '_id' => '$_id',
-                    'date_time' => ['$first' => '$date_time'],
-                    'status' => ['$first' => '$status'],
-                    'total_price' => ['$first' => '$total_price'],
-                    'method_name' => ['$first' => '$method_info.method_name'],
-                    'services' => ['$addToSet' => '$service_info.service_name']
                 ]
             ],
             [
@@ -237,7 +196,18 @@ class UseCaseController extends Controller
                     'date_time' => 1,
                     'status' => 1,
                     'total_price' => 1,
-                    'method_name' => 1,
+                    'method_name' => '$method_info.method_name',
+                    'services' => [
+                        '$map' => [
+                            'input' => '$service_info',
+                            'as' => 'srv',
+                            'in' => '$$srv.service_name'
+                        ]
+                    ]
+                ]
+            ],
+            [
+                '$addFields' => [
                     'services' => [
                         '$reduce' => [
                             'input' => '$services',
@@ -268,6 +238,7 @@ class UseCaseController extends Controller
         $appointments = $this->mongo->appointments->aggregate($pipeline)->toArray();
         return view('student2khalifa.NoSQL.customer.appointments', ['appointments' => $appointments]);
     }
+
 
     public function analyticsReport()
     {

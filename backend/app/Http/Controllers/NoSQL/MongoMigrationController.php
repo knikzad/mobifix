@@ -33,8 +33,7 @@ class MongoMigrationController extends Controller
     {
         foreach ([
             'users', 'appointments', 'repair_service', 'service_method',
-            'repair_service_appointment', 'device_model',
-            'brand', 'device_type', 'device_type_brand'
+            'device_model', 'brand', 'device_type',
         ] as $collection) {
             $this->mongo->$collection->drop();
         }
@@ -87,10 +86,9 @@ class MongoMigrationController extends Controller
         }
     }
 
-
     protected function migrateDeviceData()
     {
-        // Brands
+        // Step 1: Migrate brands first (separately)
         $brands = DB::table('brand')->get();
         foreach ($brands as $b) {
             $this->mongo->brand->insertOne([
@@ -101,36 +99,46 @@ class MongoMigrationController extends Controller
             ]);
         }
 
-        // Device Types
+        // Step 2: Fetch all device_type_brand mappings grouped by device_type_id
+        $dtbRows = DB::table('device_type_brand')->get();
+
+        $deviceTypeToBrandIds = [];
+        $brandIdToDeviceTypeId = [];
+        foreach ($dtbRows as $row) {
+            $deviceTypeToBrandIds[$row->device_type_id][] = $row->brand_id;
+            // For quick lookup device_type_id by brand_id
+            $brandIdToDeviceTypeId[$row->brand_id] = $row->device_type_id;
+        }
+
+        // Step 3: Migrate device types with embedded brand_ids
         $deviceTypes = DB::table('device_type')->get();
         foreach ($deviceTypes as $dt) {
+            $brandIds = $deviceTypeToBrandIds[$dt->device_type_id] ?? [];
+
             $this->mongo->device_type->insertOne([
                 '_id' => $dt->device_type_id,
                 'type_name' => $dt->type_name,
                 'description' => $dt->description,
+                'brand_ids' => $brandIds,  // Embed brand IDs here
             ]);
         }
 
-        // Device Type <-> Brand (Intermediate)
-        $dtb = DB::table('device_type_brand')->get();
-        foreach ($dtb as $row) {
-            $this->mongo->device_type_brand->insertOne([
-                'device_type_id' => $row->device_type_id,
-                'brand_id' => $row->brand_id
-            ]);
-        }
-
-        // Device Models
+        // Step 4: Migrate device models, add device_type_id by looking up brand_id
         $models = DB::table('device_model')->get();
         foreach ($models as $m) {
+            $device_type_id = $brandIdToDeviceTypeId[$m->brand_id] ?? null;
+
             $this->mongo->device_model->insertOne([
                 '_id' => $m->model_id,
                 'model_name' => $m->model_name,
-                'release_year' => (int) $m->release_year,
-                'brand_id' => $m->brand_id
+                'release_year' => $m->release_year !== null ? (int) $m->release_year : null,
+                'brand_id' => $m->brand_id,
+                'device_type_id' => $device_type_id,  // Added dynamically
             ]);
         }
     }
+
+
 
     protected function migrateRepairServices()
     {
@@ -150,8 +158,7 @@ class MongoMigrationController extends Controller
 
 protected function migrateAppointments()
 {
-    // Step 1: Migrate all service methods to MongoDB
-    $existingMethods = $this->mongo->service_method->distinct('method_id');
+    // Step 1: Migrate all service methods
     $sqlServiceMethods = DB::table('service_method')->get();
 
     foreach ($sqlServiceMethods as $method) {
@@ -164,13 +171,20 @@ protected function migrateAppointments()
         ]);
     }
 
-    // Step 2: Migrate appointments with method_id reference
+    // Step 2: Migrate appointments with embedded service_ids
     $appointments = DB::table('repair_appointment')->get();
 
     foreach ($appointments as $appt) {
         $payment = DB::table('payment')
             ->where('appointment_id', $appt->appointment_id)
-            ->orderByDesc('payment_number')->first();
+            ->orderByDesc('payment_number')
+            ->first();
+
+        // Fetch related service IDs (many-to-many)
+        $serviceIds = DB::table('repair_service_appointment')
+            ->where('appointment_id', $appt->appointment_id)
+            ->pluck('service_id')
+            ->toArray();
 
         $doc = [
             '_id' => $appt->appointment_id,
@@ -179,7 +193,8 @@ protected function migrateAppointments()
             'total_price' => (float) $appt->total_price,
             'customer_id' => $appt->customer_id,
             'employee_id' => $appt->employee_id,
-            'method_id' => $appt->method_id, // Reference to MongoDB's service_method
+            'method_id' => $appt->method_id, // Reference to service_method
+            'service_ids' => $serviceIds,     // Embed service references
             'payment' => $payment ? [
                 'payment_number' => $payment->payment_number,
                 'amount' => (float) $payment->amount,
@@ -190,19 +205,8 @@ protected function migrateAppointments()
         ];
 
         $this->mongo->appointments->insertOne($doc);
-
-        // Services (Intermediate)
-        $services = DB::table('repair_service_appointment')
-            ->where('appointment_id', $appt->appointment_id)
-            ->get();
-
-        foreach ($services as $s) {
-            $this->mongo->repair_service_appointment->insertOne([
-                'appointment_id' => $s->appointment_id,
-                'service_id' => $s->service_id
-            ]);
-        }
     }
 }
+
 
 }

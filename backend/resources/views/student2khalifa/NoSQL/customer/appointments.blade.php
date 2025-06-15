@@ -24,16 +24,28 @@
                         <tr>
                             <td>{{ $appointment->date_time->toDateTime()->format('Y-m-d') }}</td>
                             <td>{{ $appointment->date_time->toDateTime()->format('h:i A') }}</td>
-                            <td>{{ $appointment->services }}</td>
+                            <td>
+                                @foreach(explode(', ', $appointment->services) as $service)
+                                    <span class="badge bg-primary">{{ $service }}</span>
+                                @endforeach
+                            </td>
                             <td>{{ $appointment->method_name ?? 'N/A' }}</td>
                             <td>
-                                <span class="badge 
-                                    @if($appointment->status === 'Pending') bg-warning
-                                    @elseif($appointment->status === 'Completed') bg-success
-                                    @elseif($appointment->status === 'Canceled') bg-danger
-                                    @else bg-secondary @endif">
-                                    {{ ucfirst($appointment->status) }}
-                                </span>
+                            @php
+                                $statusClass = match($appointment->status) {
+                                    'booked' => 'bg-primary',
+                                    'confirmed' => 'bg-info',
+                                    'in-progress' => 'bg-warning',
+                                    'completed' => 'bg-success',
+                                    'cancelled' => 'bg-danger',
+                                    default => 'bg-secondary',
+                                };
+                            @endphp
+
+                            <span class="badge {{ $statusClass }}">
+                                {{ ucfirst($appointment->status) }}
+                            </span>
+
                             </td>
                             <td><strong>${{ number_format($appointment->total_price, 2) }}</strong></td>
                         </tr>

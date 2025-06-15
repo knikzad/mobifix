@@ -24,12 +24,27 @@
                         <tr>
                             <td>{{ \Carbon\Carbon::parse($appointment->date_time)->format('Y-m-d') }}</td>
                             <td>{{ \Carbon\Carbon::parse($appointment->date_time)->format('H:i A') }}</td>
-                            <td>{{ $appointment->services }}</td>
+                            <td>
+                                @foreach(explode(', ', $appointment->services) as $service)
+                                    <span class="badge bg-primary">{{ $service }}</span>
+                                @endforeach
+                            </td>
                             <td>{{ $appointment->method_name }}</td>
                             <td>
-                                <span class="badge {{ $appointment->status == 'Pending' ? 'bg-warning' : 'bg-success' }}">
-                                    {{ ucfirst($appointment->status) }}
-                                </span>
+                            @php
+                                $statusClass = match($appointment->status) {
+                                    'booked' => 'bg-primary',
+                                    'confirmed' => 'bg-info',
+                                    'in-progress' => 'bg-warning',
+                                    'completed' => 'bg-success',
+                                    'cancelled' => 'bg-danger',
+                                    default => 'bg-secondary',
+                                };
+                            @endphp
+
+                            <span class="badge {{ $statusClass }}">
+                                {{ ucfirst($appointment->status) }}
+                            </span>
                             </td>
                             <td><strong>${{ number_format($appointment->total_price, 2) }}</strong></td>
                         </tr>
