@@ -5,6 +5,11 @@
 @section('content')
 <div class="container mt-4">
     <h2 class="mb-4">My Repair Appointments (NoSQL)</h2>
+    @if(session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
 
     @if(count($appointments) > 0)
         <div class="table-responsive">
