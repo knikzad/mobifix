@@ -6,8 +6,6 @@ services:
     container_name: mobifix-backend
     restart: unless-stopped
     working_dir: /var/www
-    volumes:
-      - ./backend:/var/www:cached
     depends_on:
       - mobifix-db
       - mobifix-mongo
@@ -40,8 +38,6 @@ services:
       timeout: 5s
       retries: 5
 
-
-
   mobifix-nginx:
     image: nginx:alpine
     container_name: mobifix-nginx
@@ -50,7 +46,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./backend:/var/www
+      - ./backend:/var/www/html
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
       - ./nginx/ssl:/etc/nginx/ssl
     depends_on:
